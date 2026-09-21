@@ -3,45 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trading Panda - Signals</title>
+  <title>Trading Panda - Premium Trading Signals</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <header>
-    <h1>🐼 Trading Panda Signals</h1>
-    <button id="logout-btn" class="hidden">Logout</button>
+
+  <!-- Top Bar & Live Ticker -->
+  <header class="top-nav">
+    <div class="logo">
+      <span class="logo-icon">🐼</span>
+      <h2>TRADING <span>PANDA</span></h2>
+    </div>
+    <div class="ticker-container">
+      <div class="ticker-item"><span class="pair">XAU/USD</span> <span class="price green">$2,738.50 ▲ +0.45%</span></div>
+      <div class="ticker-item"><span class="pair">EUR/USD</span> <span class="price red">$1.0820 ▼ -0.12%</span></div>
+      <div class="ticker-item"><span class="pair">BTC/USD</span> <span class="price green">$68,450.00 ▲ +2.10%</span></div>
+    </div>
+    <div class="user-status">
+      <span id="user-badge" class="badge free">Free Plan</span>
+      <button id="logout-btn" class="hidden"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
   </header>
 
-  <main>
-    <div id="auth-section" class="card">
-      <h2>Welcome Back</h2>
-      <input type="email" id="email" placeholder="Email Address">
-      <input type="password" id="password" placeholder="Password">
-      <div class="btn-group">
-        <button id="login-btn">Login</button>
-        <button id="signup-btn" class="secondary">Sign Up</button>
-      </div>
-    </div>
+  <!-- Navigation Tabs -->
+  <nav class="main-tabs">
+    <button class="tab-btn active" data-tab="signals"><i class="fa-solid fa-bolt"></i> Signals</button>
+    <button class="tab-btn" data-tab="analytics"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+    <button class="tab-btn" data-tab="premium"><i class="fa-solid fa-crown"></i> VIP Upgrade</button>
+    <button class="tab-btn" data-tab="profile"><i class="fa-solid fa-user"></i> Profile</button>
+  </nav>
 
-    <div id="main-app" class="hidden">
-      <div id="admin-panel" class="card hidden">
-        <h3>Post New Signal (Admin)</h3>
+  <main class="container">
+
+    <!-- Auth View (Login / Signup) -->
+    <section id="auth-section" class="tab-content card">
+      <div class="auth-header">
+        <h2>Welcome to Trading Panda</h2>
+        <p>Access high-precision Forex & Crypto signals</p>
+      </div>
+      <div class="auth-form">
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        <div class="btn-group">
+          <button id="login-btn"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+          <button id="signup-btn" class="secondary"><i class="fa-solid fa-user-plus"></i> Sign Up</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 1: Signals Section -->
+    <section id="signals-tab" class="tab-content active-tab">
+      
+      <!-- Admin Panel (Only visible to admin) -->
+      <div id="admin-panel" class="card admin-box hidden">
+        <h3><i class="fa-solid fa-plus-circle"></i> Post New Signal (Admin)</h3>
         <form id="signal-form">
-          <input type="text" id="pair" placeholder="Pair (e.g. XAU/USD)" required>
-          <select id="action">
-            <option value="BUY">BUY</option>
-            <option value="SELL">SELL</option>
-          </select>
-          <input type="text" id="entry" placeholder="Entry Price" required>
-          <input type="text" id="sl" placeholder="Stop Loss (SL)" required>
-          <input type="text" id="tp" placeholder="Take Profit (TP)" required>
-          <button type="submit">Post Signal</button>
+          <div class="form-grid">
+            <input type="text" id="pair" placeholder="Pair (e.g. XAU/USD)" required>
+            <select id="action">
+              <option value="BUY">BUY 🟢</option>
+              <option value="SELL">SELL 🔴</option>
+            </select>
+            <input type="text" id="entry" placeholder="Entry Price" required>
+            <input type="text" id="sl" placeholder="Stop Loss (SL)" required>
+            <input type="text" id="tp" placeholder="Take Profit 1 (TP1)" required>
+            <input type="text" id="tp2" placeholder="Take Profit 2 (TP2)">
+          </div>
+          <button type="submit" class="glow-btn"><i class="fa-solid fa-paper-plane"></i> Publish Signal</button>
         </form>
       </div>
 
-      <h2>Live Signals Feed</h2>
-      <div id="signals-container"></div>
-    </div>
+      <!-- Live Signals Feed -->
+      <div class="feed-header">
+        <h3><i class="fa-solid fa-tower-broadcast"></i> Live Signal Feed</h3>
+        <span class="live-dot">● LIVE</span>
+      </div>
+      <div id="signals-container" class="signals-grid"></div>
+    </section>
+
+    <!-- Tab 2: Analytics Section -->
+    <section id="analytics-tab" class="tab-content hidden">
+      <div class="card">
+        <h3><i class="fa-solid fa-chart-pie"></i> Performance Statistics</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h4>Win Rate</h4>
+            <p class="stat-num green">87.5%</p>
+          </div>
+          <div class="stat-card">
+            <h4>Total Pips</h4>
+            <p class="stat-num purple">+4,250</p>
+          </div>
+          <div class="stat-card">
+            <h4>Signals Posted</h4>
+            <p class="stat-num">142</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: VIP Upgrade / Premium Section -->
+    <section id="premium-tab" class="tab-content hidden">
+      <div class="card vip-card">
+        <i class="fa-solid fa-crown vip-icon"></i>
+        <h2>Upgrade to Trading Panda VIP</h2>
+        <p>Get instant WhatsApp / App alerts, TP2/TP3 targets, and risk management calculators.</p>
+        
+        <div class="pricing-grid">
+          <div class="plan-card">
+            <h3>Monthly VIP</h3>
+            <div class="price">$20 <span>/ month</span></div>
+            <ul>
+              <li><i class="fa-solid fa-check"></i> 100% Signal Accuracy</li>
+              <li><i class="fa-solid fa-check"></i> SL & Multiple TP Levels</li>
+              <li><i class="fa-solid fa-check"></i> VIP Telegram Group Access</li>
+            </ul>
+            <button class="glow-btn">Subscribe Now</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Profile Section -->
+    <section id="profile-tab" class="tab-content hidden">
+      <div class="card">
+        <h3><i class="fa-solid fa-id-card"></i> User Profile</h3>
+        <p><strong>Email:</strong> <span id="user-email-display">Not logged in</span></p>
+        <p><strong>Account Type:</strong> <span id="user-role-display">Guest</span></p>
+      </div>
+    </section>
+
   </main>
 
   <script type="module" src="script.js"></script>
