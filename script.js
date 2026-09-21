@@ -4,13 +4,13 @@ import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/fi
 
 // Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD-placeholder", // Replace with your Firebase API Key if needed
-  authDomain: "tradingpanda-app.firebaseapp.com",
-  databaseURL: "https://tradingpanda-app-default-rtdb.firebaseio.com",
-  projectId: "tradingpanda-app",
-  storageBucket: "tradingpanda-app.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123xyz"
+  apiKey: "AIzaSyDzh22UQKA4Z3Bonp8Qd0zYNbWcCU3bE1Y",
+  authDomain: "trading-panda-74104.firebaseapp.com",
+  databaseURL: "https://trading-panda-74104-default-rtdb.firebaseio.com",
+  projectId: "trading-panda-74104",
+  storageBucket: "trading-panda-74104.firebasestorage.app",
+  messagingSenderId: "912778424578",
+  appId: "1:912778424578:web:7676f1e496cc5e5f16921b"
 };
 
 const app = initializeApp(firebaseConfig);
