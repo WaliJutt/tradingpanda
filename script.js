@@ -163,11 +163,38 @@ onValue(signalsRef, (snapshot) => {
     return;
   }
 
+ // Realtime Signal Feed Listener (5 Free Signals Limit per User)
+const signalsRef = ref(db, "signals");
+onValue(signalsRef, (snapshot) => {
+  signalsContainer.innerHTML = "";
+  const data = snapshot.val();
+  
+  if (!data) {
+    signalsContainer.innerHTML = "<p style='color: var(--text-muted); text-align: center;'>No active signals right now.</p>";
+    return;
+  }
+
+  const currentUser = auth.currentUser;
+  
+  // Check if current logged-in user is Admin or VIP
+  const isAdminOrVIP = currentUser && (currentUser.email.toLowerCase() === "admin@tradingpanda.com" || currentUser.isVIP);
+  
+  // Exact 5 Free Signals Limit
+  const FREE_LIMIT = 5; 
+
   const signalList = Object.values(data).reverse();
 
-  signalList.forEach(sig => {
+  signalList.forEach((sig, index) => {
+    const cardWrapper = document.createElement("div");
+    cardWrapper.style.position = "relative";
+    cardWrapper.style.marginBottom = "15px";
+
     const card = document.createElement("div");
-    card.className = `signal-card ${sig.action.toLowerCase()}`;
+    
+    // Pehle 5 signals free honge (index 0 se 4), 6th signal (index >= 5) lock ho jayega agar VIP/Admin nahi hai
+    const isLocked = !isAdminOrVIP && index >= FREE_LIMIT;
+    
+    card.className = `signal-card ${sig.action.toLowerCase()} ${isLocked ? 'locked' : ''}`;
     
     card.innerHTML = `
       <div class="signal-header">
@@ -189,6 +216,21 @@ onValue(signalsRef, (snapshot) => {
         </div>
       </div>
     `;
-    signalsContainer.appendChild(card);
+
+    cardWrapper.appendChild(card);
+
+    // Lock Overlay if limit exceeded
+    if (isLocked) {
+      const lockOverlay = document.createElement("div");
+      lockOverlay.className = "lock-overlay";
+      lockOverlay.innerHTML = `
+        <p>🔒 Free Limit Reached (5/5 Signals Used)</p>
+        <p style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">Upgrade to VIP for Unlimited Lifetime Signals</p>
+        <button class="unlock-btn" onclick="document.querySelector('[data-tab=\\'premium\\']').click()">Upgrade to VIP</button>
+      `;
+      cardWrapper.appendChild(lockOverlay);
+    }
+
+    signalsContainer.appendChild(cardWrapper);
   });
 });
