@@ -1,85 +1,194 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDzh22UQKA4Z3Bonp8Qd0zYNbWcCU3bE1Y",
-  authDomain: "trading-panda-74104.firebaseapp.com",
-  projectId: "trading-panda-74104",
-  storageBucket: "trading-panda-74104.firebasestorage.app",
-  messagingSenderId: "912778424578",
-  appId: "1:912778424578:web:7676f1e496cc5e5f16921b"
+  apiKey: "AIzaSyD-placeholder", // Replace with your Firebase API Key if needed
+  authDomain: "tradingpanda-app.firebaseapp.com",
+  databaseURL: "https://tradingpanda-app-default-rtdb.firebaseio.com",
+  projectId: "tradingpanda-app",
+  storageBucket: "tradingpanda-app.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123xyz"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const database = getDatabase(app);
+const db = getDatabase(app);
 
-const ADMIN_EMAIL = "admin@tradingpanda.com"; 
+// DOM Elements
+const authSection = document.getElementById("auth-section");
+const adminPanel = document.getElementById("admin-panel");
+const signalsContainer = document.getElementById("signals-container");
+const loginBtn = document.getElementById("login-btn");
+const signupBtn = document.getElementById("signup-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const signalForm = document.getElementById("signal-form");
+const userBadge = document.getElementById("user-badge");
+const userEmailDisplay = document.getElementById("user-email-display");
+const userRoleDisplay = document.getElementById("user-role-display");
 
-document.getElementById('signup-btn')?.addEventListener('click', () => {
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-  createUserWithEmailAndPassword(auth, email, pass).then(() => alert("Account Created!")).catch(err => alert(err.message));
+// Tab Navigation Logic
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
+
+tabButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    const targetTab = button.getAttribute("data-tab");
+
+    tabButtons.forEach(btn => btn.classList.remove("active"));
+    tabContents.forEach(content => {
+      content.classList.add("hidden");
+      content.classList.remove("active-tab");
+    });
+
+    button.classList.add("active");
+    
+    if (targetTab === "signals") {
+      document.getElementById("signals-tab").classList.remove("hidden");
+    } else if (targetTab === "analytics") {
+      document.getElementById("analytics-tab").classList.remove("hidden");
+    } else if (targetTab === "premium") {
+      document.getElementById("premium-tab").classList.remove("hidden");
+    } else if (targetTab === "profile") {
+      document.getElementById("profile-tab").classList.remove("hidden");
+    }
+  });
 });
 
-document.getElementById('login-btn')?.addEventListener('click', () => {
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-  signInWithEmailAndPassword(auth, email, pass).catch(err => alert(err.message));
+// Authentication Handlers
+signupBtn?.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  if (!email || !password) return alert("Please enter email and password");
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    alert("Account created successfully!");
+  } catch (error) {
+    alert(error.message);
+  }
 });
 
-document.getElementById('logout-btn')?.addEventListener('click', () => signOut(auth));
+loginBtn?.addEventListener("click", async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  if (!email || !password) return alert("Please enter email and password");
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    alert(error.message);
+  }
+});
 
+logoutBtn?.addEventListener("click", () => {
+  signOut(auth);
+});
+
+// Auth State Tracking
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    document.getElementById('auth-section').classList.add('hidden');
-    document.getElementById('main-app').classList.remove('hidden');
-    document.getElementById('logout-btn').classList.remove('hidden');
-    if (user.email === ADMIN_EMAIL) {
-      document.getElementById('admin-panel').classList.remove('hidden');
+    authSection.classList.add("hidden");
+    logoutBtn.classList.remove("hidden");
+    if (userEmailDisplay) userEmailDisplay.innerText = user.email;
+
+    // Check if Admin
+    if (user.email.toLowerCase() === "admin@tradingpanda.com") {
+      adminPanel.classList.remove("hidden");
+      if (userBadge) {
+        userBadge.innerText = "Admin VIP";
+        userBadge.className = "badge purple";
+      }
+      if (userRoleDisplay) userRoleDisplay.innerText = "Administrator";
     } else {
-      document.getElementById('admin-panel').classList.add('hidden');
+      adminPanel.classList.add("hidden");
+      if (userBadge) {
+        userBadge.innerText = "Free Member";
+        userBadge.className = "badge free";
+      }
+      if (userRoleDisplay) userRoleDisplay.innerText = "Free Member";
     }
   } else {
-    document.getElementById('auth-section').classList.remove('hidden');
-    document.getElementById('main-app').classList.add('hidden');
-    document.getElementById('logout-btn').classList.add('hidden');
-    document.getElementById('admin-panel').classList.add('hidden');
+    authSection.classList.remove("hidden");
+    adminPanel.classList.add("hidden");
+    logoutBtn.classList.add("hidden");
+    if (userEmailDisplay) userEmailDisplay.innerText = "Not logged in";
+    if (userRoleDisplay) userRoleDisplay.innerText = "Guest";
+    if (userBadge) {
+      userBadge.innerText = "Free Plan";
+      userBadge.className = "badge free";
+    }
   }
 });
 
-document.getElementById('signal-form')?.addEventListener('submit', (e) => {
+// Post Signal (Admin Only)
+signalForm?.addEventListener("submit", (e) => {
   e.preventDefault();
-  push(ref(database, 'signals'), {
-    pair: document.getElementById('pair').value,
-    action: document.getElementById('action').value,
-    entry: document.getElementById('entry').value,
-    sl: document.getElementById('sl').value,
-    tp: document.getElementById('tp').value,
+  const pair = document.getElementById("pair").value;
+  const action = document.getElementById("action").value;
+  const entry = document.getElementById("entry").value;
+  const sl = document.getElementById("sl").value;
+  const tp = document.getElementById("tp").value;
+  const tp2 = document.getElementById("tp2").value || "N/A";
+
+  const signalRef = ref(db, "signals");
+  const newSignalRef = push(signalRef);
+  
+  set(newSignalRef, {
+    pair,
+    action,
+    entry,
+    sl,
+    tp,
+    tp2,
     timestamp: Date.now()
+  }).then(() => {
+    alert("Signal Published!");
+    signalForm.reset();
+  }).catch((err) => {
+    alert(err.message);
   });
-  e.target.reset();
 });
 
-onValue(ref(database, 'signals'), (snapshot) => {
-  const container = document.getElementById('signals-container');
-  container.innerHTML = '';
+// Realtime Signal Feed Listener
+const signalsRef = ref(db, "signals");
+onValue(signalsRef, (snapshot) => {
+  signalsContainer.innerHTML = "";
   const data = snapshot.val();
-  if (data) {
-    Object.keys(data).reverse().forEach(key => {
-      const sig = data[key];
-      const card = document.createElement('div');
-      card.className = `signal-card ${sig.action.toLowerCase()}`;
-      card.innerHTML = `
-        <h3>${sig.pair} - <span class="${sig.action.toLowerCase()}">${sig.action}</span></h3>
-        <p><strong>Entry:</strong> ${sig.entry}</p>
-        <p><strong>SL:</strong> ${sig.sl} | <strong>TP:</strong> ${sig.tp}</p>
-        <small>${new Date(sig.timestamp).toLocaleTimeString()}</small>
-      `;
-      container.appendChild(card);
-    });
-  } else {
-    container.innerHTML = '<p>No active signals currently.</p>';
+  
+  if (!data) {
+    signalsContainer.innerHTML = "<p style='color: var(--text-muted); text-align: center;'>No active signals right now.</p>";
+    return;
   }
+
+  const signalList = Object.values(data).reverse();
+
+  signalList.forEach(sig => {
+    const card = document.createElement("div");
+    card.className = `signal-card ${sig.action.toLowerCase()}`;
+    
+    card.innerHTML = `
+      <div class="signal-header">
+        <span class="pair-title">${sig.pair}</span>
+        <span class="badge-action ${sig.action.toLowerCase()}">${sig.action}</span>
+      </div>
+      <div class="signal-details">
+        <div class="detail-box">
+          <span>ENTRY</span>
+          <strong>${sig.entry}</strong>
+        </div>
+        <div class="detail-box">
+          <span>STOP LOSS</span>
+          <strong class="red">${sig.sl}</strong>
+        </div>
+        <div class="detail-box">
+          <span>TAKE PROFIT 1</span>
+          <strong class="green">${sig.tp}</strong>
+        </div>
+      </div>
+    `;
+    signalsContainer.appendChild(card);
+  });
 });
