@@ -18,154 +18,160 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 // DOM Elements
-const authSection = document.getElementById("auth-section");
+const authBox = document.getElementById("auth-box");
 const adminPanel = document.getElementById("admin-panel");
-const signalsContainer = document.getElementById("signals-container");
+const userBadge = document.getElementById("user-badge");
+const logoutBtn = document.getElementById("logout-btn");
+
+const emailInput = document.getElementById("auth-email");
+const passwordInput = document.getElementById("auth-password");
 const loginBtn = document.getElementById("login-btn");
 const signupBtn = document.getElementById("signup-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const signalForm = document.getElementById("signal-form");
-const userBadge = document.getElementById("user-badge");
-const userEmailDisplay = document.getElementById("user-email-display");
-const userRoleDisplay = document.getElementById("user-role-display");
 
-// Tab Navigation Logic
-const tabButtons = document.querySelectorAll(".tab-btn");
+const pairInput = document.getElementById("pair-input");
+const actionSelect = document.getElementById("action-select");
+const entryInput = document.getElementById("entry-input");
+const slInput = document.getElementById("sl-input");
+const tp1Input = document.getElementById("tp1-input");
+const publishBtn = document.getElementById("publish-btn");
+
+const signalsContainer = document.getElementById("signals-container");
+const navTabs = document.querySelectorAll(".nav-tab");
 const tabContents = document.querySelectorAll(".tab-content");
 
-tabButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    const targetTab = button.getAttribute("data-tab");
+// Navigation Tabs Logic
+navTabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    navTabs.forEach(t => t.classList.remove("active"));
+    tabContents.forEach(c => c.classList.remove("active"));
 
-    tabButtons.forEach(btn => btn.classList.remove("active"));
-    tabContents.forEach(content => {
-      content.classList.add("hidden");
-      content.classList.remove("active-tab");
-    });
-
-    button.classList.add("active");
-    
-    if (targetTab === "signals") {
-      document.getElementById("signals-tab").classList.remove("hidden");
-    } else if (targetTab === "analytics") {
-      document.getElementById("analytics-tab").classList.remove("hidden");
-    } else if (targetTab === "premium") {
-      document.getElementById("premium-tab").classList.remove("hidden");
-    } else if (targetTab === "profile") {
-      document.getElementById("profile-tab").classList.remove("hidden");
+    tab.classList.add("active");
+    const target = tab.getAttribute("data-tab");
+    const targetElement = document.getElementById(`${target}-tab`);
+    if (targetElement) {
+      targetElement.classList.add("active");
     }
   });
 });
 
-// Authentication Handlers
-signupBtn?.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  if (!email || !password) return alert("Please enter email and password");
-  try {
-    await createUserWithEmailAndPassword(auth, email, password);
-    alert("Account created successfully!");
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-loginBtn?.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  if (!email || !password) return alert("Please enter email and password");
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    alert(error.message);
-  }
-});
-
-logoutBtn?.addEventListener("click", () => {
-  signOut(auth);
-});
-
-// Auth State Tracking
+// Authentication State Listener
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    authSection.classList.add("hidden");
-    logoutBtn.classList.remove("hidden");
-    if (userEmailDisplay) userEmailDisplay.innerText = user.email;
+    authBox.style.display = "none";
+    logoutBtn.style.display = "inline-flex";
 
-    // Check if Admin
-    if (user.email.toLowerCase() === "admin@tradingpanda.com") {
-      adminPanel.classList.remove("hidden");
-      if (userBadge) {
-        userBadge.innerText = "Admin VIP";
-        userBadge.className = "badge purple";
-      }
-      if (userRoleDisplay) userRoleDisplay.innerText = "Administrator";
+    const userEmail = user.email ? user.email.toLowerCase() : "";
+    
+    if (userEmail === "admin@tradingpanda.com") {
+      userBadge.textContent = "Admin VIP";
+      userBadge.className = "user-badge vip";
+      if (adminPanel) adminPanel.style.display = "block";
     } else {
-      adminPanel.classList.add("hidden");
-      if (userBadge) {
-        userBadge.innerText = "Free Member";
-        userBadge.className = "badge free";
-      }
-      if (userRoleDisplay) userRoleDisplay.innerText = "Free Member";
+      userBadge.textContent = "Free Plan";
+      userBadge.className = "user-badge free";
+      if (adminPanel) adminPanel.style.display = "none";
     }
   } else {
-    authSection.classList.remove("hidden");
-    adminPanel.classList.add("hidden");
-    logoutBtn.classList.add("hidden");
-    if (userEmailDisplay) userEmailDisplay.innerText = "Not logged in";
-    if (userRoleDisplay) userRoleDisplay.innerText = "Guest";
-    if (userBadge) {
-      userBadge.innerText = "Free Plan";
-      userBadge.className = "badge free";
+    authBox.style.display = "block";
+    logoutBtn.style.display = "none";
+    if (adminPanel) adminPanel.style.display = "none";
+    userBadge.textContent = "Free Plan";
+    userBadge.className = "user-badge free";
+  }
+});
+
+// Login
+if (loginBtn) {
+  loginBtn.addEventListener("click", () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
     }
-  }
-});
 
-// Post Signal (Admin Only)
-signalForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const pair = document.getElementById("pair").value;
-  const action = document.getElementById("action").value;
-  const entry = document.getElementById("entry").value;
-  const sl = document.getElementById("sl").value;
-  const tp = document.getElementById("tp").value;
-  const tp2 = document.getElementById("tp2").value || "N/A";
-
-  const signalRef = ref(db, "signals");
-  const newSignalRef = push(signalRef);
-  
-  set(newSignalRef, {
-    pair,
-    action,
-    entry,
-    sl,
-    tp,
-    tp2,
-    timestamp: Date.now()
-  }).then(() => {
-    alert("Signal Published!");
-    signalForm.reset();
-  }).catch((err) => {
-    alert(err.message);
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        emailInput.value = "";
+        passwordInput.value = "";
+      })
+      .catch((error) => {
+        alert("Login Error: " + error.message);
+      });
   });
-});
+}
 
-// Realtime Signal Feed Listener
+// Signup
+if (signupBtn) {
+  signupBtn.addEventListener("click", () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        alert("Account created successfully!");
+        emailInput.value = "";
+        passwordInput.value = "";
+      })
+      .catch((error) => {
+        alert("Signup Error: " + error.message);
+      });
+  });
+}
+
+// Logout
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth).then(() => {
+      alert("Logged out successfully");
+    });
+  });
+}
+
+// Admin - Publish Signal
+if (publishBtn) {
+  publishBtn.addEventListener("click", () => {
+    const pair = pairInput.value.trim();
+    const action = actionSelect.value;
+    const entry = entryInput.value.trim();
+    const sl = slInput.value.trim();
+    const tp = tp1Input.value.trim();
+
+    if (!pair || !entry || !sl || !tp) {
+      alert("Please fill in all signal fields.");
+      return;
+    }
+
+    const newSignalRef = push(ref(db, "signals"));
+    set(newSignalRef, {
+      pair: pair.toUpperCase(),
+      action: action,
+      entry: entry,
+      sl: sl,
+      tp: tp,
+      timestamp: Date.now()
+    }).then(() => {
+      alert("Signal published live!");
+      pairInput.value = "";
+      entryInput.value = "";
+      slInput.value = "";
+      tp1Input.value = "";
+    }).catch((err) => {
+      alert("Failed to publish signal: " + err.message);
+    });
+  });
+}
+
+// Realtime Signal Feed Listener (5 Free Signals Limit per User)
 const signalsRef = ref(db, "signals");
 onValue(signalsRef, (snapshot) => {
-  signalsContainer.innerHTML = "";
-  const data = snapshot.val();
-  
-  if (!data) {
-    signalsContainer.innerHTML = "<p style='color: var(--text-muted); text-align: center;'>No active signals right now.</p>";
-    return;
-  }
-
- // Realtime Signal Feed Listener (5 Free Signals Limit per User)
-const signalsRef = ref(db, "signals");
-onValue(signalsRef, (snapshot) => {
+  if (!signalsContainer) return;
   signalsContainer.innerHTML = "";
   const data = snapshot.val();
   
@@ -175,13 +181,9 @@ onValue(signalsRef, (snapshot) => {
   }
 
   const currentUser = auth.currentUser;
-  
-  // Check if current logged-in user is Admin or VIP
   const isAdminOrVIP = currentUser && (currentUser.email.toLowerCase() === "admin@tradingpanda.com" || currentUser.isVIP);
   
-  // Exact 5 Free Signals Limit
   const FREE_LIMIT = 5; 
-
   const signalList = Object.values(data).reverse();
 
   signalList.forEach((sig, index) => {
@@ -190,8 +192,6 @@ onValue(signalsRef, (snapshot) => {
     cardWrapper.style.marginBottom = "15px";
 
     const card = document.createElement("div");
-    
-    // Pehle 5 signals free honge (index 0 se 4), 6th signal (index >= 5) lock ho jayega agar VIP/Admin nahi hai
     const isLocked = !isAdminOrVIP && index >= FREE_LIMIT;
     
     card.className = `signal-card ${sig.action.toLowerCase()} ${isLocked ? 'locked' : ''}`;
@@ -219,7 +219,6 @@ onValue(signalsRef, (snapshot) => {
 
     cardWrapper.appendChild(card);
 
-    // Lock Overlay if limit exceeded
     if (isLocked) {
       const lockOverlay = document.createElement("div");
       lockOverlay.className = "lock-overlay";
