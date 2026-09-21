@@ -1,59 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trading Panda — Signals & Insights</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading Panda - Signals</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-header">
-    <h1>Trading Panda</h1>
-    <p>Live Signals & Market Insights</p>
-  </div>
+  <header>
+    <h1>🐼 Trading Panda Signals</h1>
+    <button id="logout-btn" class="hidden">Logout</button>
+  </header>
 
-  <div class="container">
-    <!-- Active Signals List -->
-    <div id="signals-container">
-      <h3>Active Signals</h3>
-      <div id="active-signals-list"></div>
+  <main>
+    <div id="auth-section" class="card">
+      <h2>Welcome Back</h2>
+      <input type="email" id="email" placeholder="Email Address">
+      <input type="password" id="password" placeholder="Password">
+      <div class="btn-group">
+        <button id="login-btn">Login</button>
+        <button id="signup-btn" class="secondary">Sign Up</button>
+      </div>
     </div>
-  </div>
 
-  <!-- VIP Payment Modal -->
-  <div id="payment-modal" class="modal-backdrop">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Upgrade to VIP Access</h3>
-        <button class="close-btn" onclick="closeModal('payment-modal')">&times;</button>
-      </div>
-      
-      <div class="payment-details-box">
-        <p>Send <b>Rs. 5,000</b> or <b>$20 USDT</b> to:</p>
-        <div>Easypaisa / JazzCash: <code>03XX-XXXXXXX</code></div>
-        <div style="margin-top:4px;">USDT (TRC20): <code>TXXXXXXXXXXXX...</code></div>
-      </div>
-
-      <form id="payment-submit-form">
-        <div class="form-group">
-          <label>Payment Method</label>
-          <select id="pay-method" class="form-input">
-            <option value="Easypaisa">Easypaisa</option>
-            <option value="JazzCash">JazzCash</option>
-            <option value="USDT">USDT (TRC20)</option>
+    <div id="main-app" class="hidden">
+      <div id="admin-panel" class="card hidden">
+        <h3>Post New Signal (Admin)</h3>
+        <form id="signal-form">
+          <input type="text" id="pair" placeholder="Pair (e.g. XAU/USD)" required>
+          <select id="action">
+            <option value="BUY">BUY</option>
+            <option value="SELL">SELL</option>
           </select>
-        </div>
+          <input type="text" id="entry" placeholder="Entry Price" required>
+          <input type="text" id="sl" placeholder="Stop Loss (SL)" required>
+          <input type="text" id="tp" placeholder="Take Profit (TP)" required>
+          <button type="submit">Post Signal</button>
+        </form>
+      </div>
 
-        <div class="form-group">
-          <label>Transaction ID / Ref No.</label>
-          <input type="text" id="pay-txid" class="form-input" placeholder="e.g. 2198302193" required />
-        </div>
-
-        <button type="submit" class="btn-upgrade" style="width: 100%;">Submit Verification</button>
-      </form>
+      <h2>Live Signals Feed</h2>
+      <div id="signals-container"></div>
     </div>
-  </div>
+  </main>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
