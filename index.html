@@ -46,6 +46,13 @@
       <li class="menu-item" data-tab="settings"><i class="fa-solid fa-gear"></i> Profile Settings</li>
       <li class="menu-item highlight-vip" data-tab="premium"><i class="fa-solid fa-crown"></i> Upgrade Your Plan (VIP)</li>
     </ul>
+
+    <!-- Quick Help Option -->
+    <div class="sidebar-footer" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+      <a href="https://wa.me/923000000000" target="_blank" class="support-btn" style="display:flex; align-items:center; gap:10px; color:#25D366; text-decoration:none; font-weight:bold;">
+        <i class="fa-brands fa-whatsapp" style="font-size:1.3rem;"></i> 24/7 VIP Support
+      </a>
+    </div>
   </aside>
 
   <!-- Main Content Wrapper -->
@@ -85,6 +92,14 @@
           </div>
           <button type="submit" class="glow-btn"><i class="fa-solid fa-paper-plane"></i> Publish Signal</button>
         </form>
+
+        <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
+        
+        <!-- Admin TID Review Requests -->
+        <h3><i class="fa-solid fa-receipt"></i> Pending VIP Payment Requests</h3>
+        <div id="payment-requests-container" style="margin-top:15px;">
+          <p style="color:var(--text-muted); font-size:0.9rem;">No pending VIP payment requests right now.</p>
+        </div>
       </div>
 
       <div class="feed-header">
@@ -162,7 +177,7 @@
           
           <button id="calculate-btn" class="glow-btn">Calculate Lot Size</button>
           
-          <div class="calc-result">
+          <div class="calc-result" style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.03); border-radius:10px;">
             <h4>Recommended Lot Size: <span id="lot-result" class="green">0.03 Lot</span></h4>
             <p>Risk Amount: $<span id="risk-amount">10.00</span></p>
           </div>
@@ -175,8 +190,8 @@
       <div class="card">
         <h3>⚙️ Profile Settings</h3>
         <div class="profile-settings">
-          <div class="avatar-upload">
-            <img id="profile-img-preview" src="https://via.placeholder.com/100" alt="Profile Picture">
+          <div class="avatar-upload" style="margin-bottom:15px;">
+            <img id="profile-img-preview" src="https://via.placeholder.com/100" alt="Profile Picture" style="border-radius:50%; margin-bottom:10px;">
             <input type="file" id="avatar-input" accept="image/*">
           </div>
           <div class="form-group">
@@ -191,19 +206,21 @@
     <!-- 7. VIP Upgrade & Local Payment Tab -->
     <section id="premium-tab" class="tab-content hidden">
       <div class="card vip-card">
-        <i class="fa-solid fa-crown vip-icon"></i>
+        <i class="fa-solid fa-crown vip-icon" style="font-size:2.5rem; color:#ffd700; margin-bottom:10px;"></i>
         <h2>Upgrade to Trading Panda VIP</h2>
-        <p>Get instant Live signals without limits + TP2/TP3 targets.</p>
+        <p style="color:var(--text-muted); margin-bottom:20px;">Get instant Live signals without limits + TP2/TP3 targets.</p>
         
         <div class="payment-methods card">
           <h3>Local Payment Details</h3>
-          <p><strong>Easypaisa:</strong> 0300-XXXXXXX (Account Title)</p>
-          <p><strong>JazzCash:</strong> 0300-XXXXXXX (Account Title)</p>
-          <p><strong>USDT (TRC20):</strong> TXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
-          <hr>
-          <h4>Submit Payment Screenshot / Transaction ID</h4>
-          <input type="text" id="tid-input" placeholder="Enter Transaction ID (TID)">
-          <button id="submit-tid-btn" class="glow-btn">Submit Payment Proof</button>
+          <p style="margin-top:10px;"><strong>Easypaisa:</strong> <span style="color:#00e676;">0300-1234567</span> (Passu Trading)</p>
+          <p><strong>JazzCash:</strong> <span style="color:#00e676;">0300-1234567</span> (Passu Trading)</p>
+          <p><strong>USDT (TRC20):</strong> <span style="color:#8a2be2; font-size:0.85rem;">TXX1234567890ABCDEFGH</span></p>
+          <hr style="margin:15px 0; border-color:rgba(255,255,255,0.1);">
+          <h4>Submit Transaction ID (TID) Proof</h4>
+          <form id="tid-form" style="margin-top:10px;">
+            <input type="text" id="tid-input" placeholder="Enter Transaction ID / TID Number" required>
+            <button type="submit" id="submit-tid-btn" class="glow-btn"><i class="fa-solid fa-check-circle"></i> Submit Payment Proof</button>
+          </form>
         </div>
       </div>
     </section>
