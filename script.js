@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, set, remove, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -31,6 +31,9 @@ const userBadge = document.getElementById("user-badge");
 const tidForm = document.getElementById("tid-form");
 const paymentRequestsContainer = document.getElementById("payment-requests-container");
 const adminRequestsMenuItem = document.getElementById("admin-requests-menu-item");
+
+let userSignupTime = 0;
+let isUserVIP = false;
 
 // Direct Universal Sidebar Logic
 document.addEventListener("click", (e) => {
@@ -85,8 +88,17 @@ if (signupBtn) {
     const password = passwordInput.value.trim();
     if (!email || !password) return alert("Please enter email and password");
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert("Account created successfully!");
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Save user details with signup timestamp
+      await set(ref(db, `users/${user.uid}`), {
+        email: email,
+        signupTime: Date.now(),
+        isVIP: false
+      });
+
+      alert("Account created successfully! You get 5 free new signals.");
     } catch (error) {
       alert(error.message);
     }
@@ -113,10 +125,22 @@ if (logoutBtn) {
 }
 
 // Auth State Observer
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     if (authSection) authSection.classList.add("hidden");
     if (logoutBtn) logoutBtn.classList.remove("hidden");
+
+    const userRef = ref(db, `users/${user.uid}`);
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+
+    if (userData) {
+      userSignupTime = userData.signupTime || Date.now();
+      isUserVIP = userData.isVIP || false;
+    } else {
+      userSignupTime = Date.now();
+      isUserVIP = false;
+    }
 
     if (user.email.toLowerCase() === "admin@tradingpanda.com") {
       if (adminPanel) adminPanel.classList.remove("hidden");
@@ -130,11 +154,17 @@ onAuthStateChanged(auth, (user) => {
       if (adminPanel) adminPanel.classList.add("hidden");
       if (adminRequestsMenuItem) adminRequestsMenuItem.classList.add("hidden");
       if (userBadge) {
-        userBadge.innerText = user.isVIP ? "VIP Member 👑" : "Free Member";
-        userBadge.className = user.isVIP ? "badge purple" : "badge free";
+        userBadge.innerText = isUserVIP ? "VIP Member 👑" : "Free Member";
+        userBadge.className = isUserVIP ? "badge purple" : "badge free";
       }
     }
+    
+    // Refresh signals feed according to user status
+    listenToSignals();
+
   } else {
+    userSignupTime = 0;
+    isUserVIP = false;
     if (authSection) authSection.classList.remove("hidden");
     if (adminPanel) adminPanel.classList.add("hidden");
     if (adminRequestsMenuItem) adminRequestsMenuItem.classList.add("hidden");
@@ -143,6 +173,7 @@ onAuthStateChanged(auth, (user) => {
       userBadge.innerText = "Free Plan";
       userBadge.className = "badge free";
     }
+    listenToSignals();
   }
 });
 
@@ -202,8 +233,9 @@ function loadPaymentRequests() {
   });
 }
 
-window.approveVIP = (uid) => {
-  remove(ref(db, `payment_requests/${uid}`));
+window.approveVIP = async (uid) => {
+  await set(ref(db, `users/${uid}/isVIP`), true);
+  await remove(ref(db, `payment_requests/${uid}`));
   alert("Payment Approved! VIP status granted.");
 };
 
@@ -241,60 +273,81 @@ if (signalForm) {
   });
 }
 
-// Realtime Signal Feed Listener
-const signalsRef = ref(db, "signals");
-onValue(signalsRef, (snapshot) => {
-  if (!signalsContainer) return;
-  signalsContainer.innerHTML = "";
-  const data = snapshot.val();
-  
-  if (!data) {
-    signalsContainer.innerHTML = "<p style='color: var(--text-muted); text-align: center;'>No active signals right now.</p>";
-    return;
-  }
-
-  const currentUser = auth.currentUser;
-  const isAdminOrVIP = currentUser && (currentUser.email.toLowerCase() === "admin@tradingpanda.com" || currentUser.isVIP);
-  
-  const entries = Object.entries(data).reverse();
-  const totalSignals = entries.length;
-
-  entries.forEach(([key, sig], index) => {
-    const cardWrapper = document.createElement("div");
-    cardWrapper.style.position = "relative";
-    cardWrapper.style.marginBottom = "15px";
-
-    const card = document.createElement("div");
+// Realtime Signal Feed Listener with 5 Free Trial Logic
+function listenToSignals() {
+  const signalsRef = ref(db, "signals");
+  onValue(signalsRef, (snapshot) => {
+    if (!signalsContainer) return;
+    signalsContainer.innerHTML = "";
+    const data = snapshot.val();
     
-    const isNewSignal = index < (totalSignals - 5);
-    const isLocked = !isAdminOrVIP && isNewSignal;
-    
-    card.className = `signal-card ${sig.action.toLowerCase()} ${isLocked ? 'locked' : ''}`;
-    
-    card.innerHTML = `
-      <div class="signal-header">
-        <span class="pair-title" style="font-weight:bold; font-size:1.1rem;">${sig.pair}</span>
-        <span class="badge ${sig.action.toLowerCase() === 'buy' ? 'green' : 'red'}" style="float:right;">${sig.action}</span>
-      </div>
-      <div class="signal-details" style="display:flex; justify-content:space-between; margin-top:10px;">
-        <div><span>ENTRY: </span><strong>${sig.entry}</strong></div>
-        <div><span>SL: </span><strong class="red">${sig.sl}</strong></div>
-        <div><span>TP: </span><strong class="green">${sig.tp}</strong></div>
-      </div>
-    `;
-
-    cardWrapper.appendChild(card);
-
-    if (isLocked) {
-      const lockOverlay = document.createElement("div");
-      lockOverlay.className = "lock-overlay";
-      lockOverlay.innerHTML = `
-        <p style="color:#fff; font-weight:bold;">🔒 New VIP Signal Locked</p>
-        <button class="unlock-btn" style="margin-top:8px;" onclick="document.querySelector('[data-tab=\\'premium\\']').click()">Upgrade to VIP</button>
-      `;
-      cardWrapper.appendChild(lockOverlay);
+    if (!data) {
+      signalsContainer.innerHTML = "<p style='color: var(--text-muted); text-align: center;'>No active signals right now.</p>";
+      return;
     }
 
-    signalsContainer.appendChild(cardWrapper);
+    const currentUser = auth.currentUser;
+    const isAdmin = currentUser && currentUser.email.toLowerCase() === "admin@tradingpanda.com";
+    const isVIP = isUserVIP || isAdmin;
+
+    // Convert object to array and sort by time (newest first)
+    const signalList = Object.entries(data)
+      .map(([id, val]) => ({ id, ...val }))
+      .sort((a, b) => b.timestamp - a.timestamp);
+
+    // Filter signals published AFTER user registered
+    let userNewSignalsCount = 0;
+
+    signalList.forEach((sig) => {
+      const cardWrapper = document.createElement("div");
+      cardWrapper.style.position = "relative";
+      cardWrapper.style.marginBottom = "15px";
+
+      const card = document.createElement("div");
+      let isLocked = false;
+
+      if (!isVIP) {
+        // If signal came after user signed up
+        if (userSignupTime > 0 && sig.timestamp >= userSignupTime) {
+          userNewSignalsCount++;
+          // Unlock first 5 signals, lock 6th onwards
+          if (userNewSignalsCount > 5) {
+            isLocked = true;
+          }
+        } else {
+          // All older historical signals published before signup are locked for free user
+          isLocked = true;
+        }
+      }
+
+      card.className = `signal-card ${sig.action.toLowerCase()} ${isLocked ? 'locked' : ''}`;
+      
+      card.innerHTML = `
+        <div class="signal-header">
+          <span class="pair-title" style="font-weight:bold; font-size:1.1rem;">${sig.pair}</span>
+          <span class="badge ${sig.action.toLowerCase() === 'buy' ? 'green' : 'red'}" style="float:right;">${sig.action}</span>
+        </div>
+        <div class="signal-details" style="display:flex; justify-content:space-between; margin-top:10px;">
+          <div><span>ENTRY: </span><strong>${sig.entry}</strong></div>
+          <div><span>SL: </span><strong class="red">${sig.sl}</strong></div>
+          <div><span>TP: </span><strong class="green">${sig.tp}</strong></div>
+        </div>
+      `;
+
+      cardWrapper.appendChild(card);
+
+      if (isLocked) {
+        const lockOverlay = document.createElement("div");
+        lockOverlay.className = "lock-overlay";
+        lockOverlay.innerHTML = `
+          <p style="color:#fff; font-weight:bold;">🔒 5-Free Trial Limit Reached</p>
+          <p style="color:var(--text-muted); font-size:0.8rem; margin-top:3px;">Upgrade to VIP to access unlimited signals</p>
+          <button class="unlock-btn" style="margin-top:8px;" onclick="document.querySelector('[data-tab=\\'premium\\']').click()">Upgrade to VIP</button>
+        `;
+        cardWrapper.appendChild(lockOverlay);
+      }
+
+      signalsContainer.appendChild(cardWrapper);
+    });
   });
-});
+}
