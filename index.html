@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Panda - Full VIP Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Trading Panda - Professional VIP Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
-<body class="bg-[#0b0813] text-white min-h-screen flex flex-col">
+<body class="bg-[#0b0813] text-white min-h-screen flex flex-col font-sans">
 
-    <!-- Top Header Navigation Bar -->
-    <header class="flex items-center justify-between px-6 py-3 bg-[#120b22] border-b border-purple-900/30 w-full z-30">
+    <!-- Top Navigation Header -->
+    <header class="flex items-center justify-between px-6 py-3.5 bg-[#120b22] border-b border-purple-900/30 w-full z-30 sticky top-0">
         <div class="flex items-center gap-4">
-            <button id="toggle-sidebar-btn" class="text-gray-300 hover:text-white text-xl p-1 focus:outline-none">
+            <button id="toggle-sidebar-btn" class="md:hidden text-gray-300 hover:text-white text-xl p-1 focus:outline-none">
                 ☰
             </button>
             <h1 class="text-xl font-extrabold tracking-wide flex items-center gap-2">
@@ -20,14 +20,14 @@
             </h1>
         </div>
 
-        <!-- Price Ticker -->
-        <div class="hidden lg:flex items-center gap-6 text-xs font-semibold bg-[#1c1335]/60 px-4 py-2 rounded-lg border border-purple-900/20">
-            <div>XAU/USD <span class="text-emerald-400 ml-1">$2,738.50 ▲ +0.45%</span></div>
-            <div>EUR/USD <span class="text-rose-400 ml-1">$1.0820 ▼ -0.12%</span></div>
-            <div>BTC/USD <span class="text-emerald-400 ml-1">$68,450.00 ▲ +2.10%</span></div>
+        <!-- Live Ticker -->
+        <div class="hidden lg:flex items-center gap-6 text-xs font-semibold bg-[#1c1335]/70 px-4 py-2 rounded-lg border border-purple-900/30">
+            <div>XAU/USD <span class="text-emerald-400 ml-1 font-bold">$2,738.50 ▲ +0.45%</span></div>
+            <div>EUR/USD <span class="text-rose-400 ml-1 font-bold">$1.0820 ▼ -0.12%</span></div>
+            <div>BTC/USD <span class="text-emerald-400 ml-1 font-bold">$68,450.00 ▲ +2.10%</span></div>
         </div>
 
-        <!-- Role Switcher -->
+        <!-- Role Selector Switcher -->
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-2 bg-[#1c1335] px-3 py-1.5 rounded-lg border border-purple-900/40">
                 <label class="text-[11px] text-gray-400 font-medium">View As:</label>
@@ -43,52 +43,51 @@
         </div>
     </header>
 
-    <!-- Main Workspace Layout -->
+    <!-- Main Workspace Container -->
     <div class="flex flex-1 overflow-hidden relative">
 
         <!-- Sidebar Navigation Drawer -->
-        <aside id="sidebar-drawer" class="w-64 bg-[#120b22] border-r border-purple-900/30 flex flex-col justify-between p-4 transition-all duration-300 z-20 shrink-0">
+        <aside id="sidebar-drawer" class="w-64 bg-[#120b22] border-r border-purple-900/30 flex flex-col justify-between p-4 z-20 shrink-0">
             <div class="space-y-6">
                 <div class="text-xs font-bold text-gray-400 uppercase tracking-wider px-3">
                     Menu Options
                 </div>
                 <nav class="space-y-1.5 text-sm font-medium">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-purple-600/20 text-purple-300 border border-purple-500/30 font-semibold text-left">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 font-semibold text-left">
                         📊 <span>Dashboard / Overview</span>
                     </button>
-                    <button onclick="switchTab('chart')" id="nav-chart" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
+                    <button onclick="switchTab('chart')" id="nav-chart" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
                         📈 <span>TradingView Live Chart</span>
                     </button>
-                    <button onclick="switchTab('accuracy')" id="nav-accuracy" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
+                    <button onclick="switchTab('accuracy')" id="nav-accuracy" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
                         🪙 <span>Gold Accuracy & Win Rate</span>
                     </button>
-                    <button onclick="switchTab('analytics')" id="nav-analytics" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
                         🌐 <span>Forex Pairs Analytics</span>
                     </button>
-                    <button onclick="switchTab('calculator')" id="nav-calculator" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
+                    <button onclick="switchTab('calculator')" id="nav-calculator" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
                         🧮 <span>Gold & Forex Lot Calculator</span>
                     </button>
-                    <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
+                    <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
                         ⚙️ <span>Profile Settings</span>
                     </button>
                 </nav>
             </div>
 
-            <!-- Upgrade VIP CTA -->
+            <!-- Upgrade Plan Button -->
             <div id="sidebar-upgrade-box" class="pt-4 border-t border-purple-900/30">
-                <button onclick="alert('Redirecting to VIP Upgrade...')" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition text-xs">
+                <button onclick="switchTab('settings')" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition text-xs">
                     👑 Upgrade Your Plan (VIP)
                 </button>
             </div>
         </aside>
 
-        <!-- Main Content Area -->
+        <!-- Main Body Content Area -->
         <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
 
-            <!-- TAB 1: DASHBOARD & LIVE SIGNAL FEED -->
+            <!-- TAB 1: DASHBOARD & LIVE SIGNALS -->
             <div id="tab-dashboard" class="tab-content space-y-6">
                 
-                <!-- Feed Header -->
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-bold flex items-center gap-2">
                         <span class="text-purple-400">📡</span> Live Signal Feed
@@ -97,15 +96,15 @@
                         <span id="user-status-badge" class="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full font-semibold border border-purple-500/30">
                             Free Access (First 5 Signals)
                         </span>
-                        <span class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-semibold border border-emerald-500/30 flex items-center gap-1">
+                        <span class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-semibold border border-emerald-500/30 flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> LIVE
                         </span>
                     </div>
                 </div>
 
-                <!-- Signal Cards Container -->
+                <!-- Signal Feed Cards Container -->
                 <div id="signals-feed-list" class="space-y-4 max-w-4xl">
-                    <!-- Javascript Dynamic Cards Injection -->
+                    <!-- Dynamic Signals Rendered via Javascript -->
                 </div>
 
                 <!-- Admin Publish Signal Form -->
@@ -128,7 +127,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-gray-400 mb-1">Entry Price</label>
                                 <input type="number" step="any" id="signal-entry" placeholder="2738.50" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
@@ -137,9 +136,20 @@
                                 <label class="block text-xs text-gray-400 mb-1">Stop Loss (SL)</label>
                                 <input type="number" step="any" id="signal-sl" placeholder="2725.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label class="block text-xs text-gray-400 mb-1">Take Profit (TP)</label>
-                                <input type="number" step="any" id="signal-tp" placeholder="2750.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                                <label class="block text-xs text-gray-400 mb-1">Take Profit 1 (TP1)</label>
+                                <input type="number" step="any" id="signal-tp1" placeholder="2745.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Take Profit 2 (TP2)</label>
+                                <input type="number" step="any" id="signal-tp2" placeholder="2755.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Take Profit 3 (TP3)</label>
+                                <input type="number" step="any" id="signal-tp3" placeholder="2770.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500">
                             </div>
                         </div>
 
@@ -148,74 +158,499 @@
                         </button>
                     </form>
                 </div>
+
+                <!-- Admin Pending Payments Review Section -->
+                <div id="admin-payments-section" class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
+                    <h3 class="text-md font-bold text-amber-400 flex items-center gap-2">
+                        💳 Admin: Pending Payment Verifications
+                    </h3>
+                    <div id="pending-payments-list" class="space-y-3">
+                        <!-- Pending Payments Loaded Dynamically -->
+                    </div>
+                </div>
+
             </div>
 
             <!-- TAB 2: TRADINGVIEW LIVE CHART -->
-            <div id="tab-chart" class="tab-content hidden space-y-4">
-                <h2 class="text-lg font-bold text-purple-300">TradingView Live Gold & Forex Chart</h2>
-                <div class="bg-[#130d24] p-4 rounded-xl border border-purple-900/30 h-[550px] flex items-center justify-center">
-                    <p class="text-gray-400 text-sm">TradingView Live Widget Embed (XAUUSD / EURUSD)</p>
+            <div id="tab-chart" class="tab-content hidden space-y-4 max-w-5xl">
+                <h2 class="text-lg font-bold text-purple-300">TradingView Live Gold Chart</h2>
+                <div class="bg-[#130d24] p-2 rounded-xl border border-purple-900/30 h-[550px] w-full" id="tradingview_chart_container">
+                    <!-- Embedded Chart Widget -->
                 </div>
             </div>
 
-            <!-- TAB 3: GOLD ACCURACY -->
-            <div id="tab-accuracy" class="tab-content hidden space-y-4">
-                <h2 class="text-lg font-bold text-purple-300">Gold Performance & Win Rate Analytics</h2>
+            <!-- TAB 3: GOLD ACCURACY & WIN RATE -->
+            <div id="tab-accuracy" class="tab-content hidden space-y-4 max-w-5xl">
+                <h2 class="text-lg font-bold text-purple-300">Gold Performance & Closed Trade History</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 text-center">
-                        <p class="text-xs text-gray-400">Monthly Win Rate</p>
-                        <p class="text-2xl font-bold text-emerald-400 mt-1">91.4%</p>
+                        <p class="text-xs text-gray-400">Gold Win Rate</p>
+                        <p id="gold-winrate-stat" class="text-2xl font-bold text-emerald-400 mt-1">100%</p>
                     </div>
                     <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 text-center">
-                        <p class="text-xs text-gray-400">Total Pips Gained</p>
-                        <p class="text-2xl font-bold text-purple-400 mt-1">+4,250 Pips</p>
+                        <p class="text-xs text-gray-400">Total Gold Trades</p>
+                        <p id="gold-trades-count" class="text-2xl font-bold text-purple-400 mt-1">0</p>
                     </div>
                     <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 text-center">
-                        <p class="text-xs text-gray-400">Successful Signals</p>
-                        <p class="text-2xl font-bold text-blue-400 mt-1">48 / 52</p>
+                        <p class="text-xs text-gray-400">Wins / Losses</p>
+                        <p id="gold-wins-loss-stat" class="text-2xl font-bold text-blue-400 mt-1">0 / 0</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 space-y-3">
+                    <h3 class="text-sm font-bold text-gray-300">Closed Gold Signals Log</h3>
+                    <div id="gold-closed-list" class="space-y-2 text-sm">
+                        <!-- Closed Gold Signals -->
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 4: FOREX ANALYTICS -->
-            <div id="tab-analytics" class="tab-content hidden space-y-4">
-                <h2 class="text-lg font-bold text-purple-300">Forex Pairs Heatmap</h2>
-                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 text-center text-gray-400">
-                    Live market volatility & currency strength analytics display.
+            <!-- TAB 4: FOREX PAIRS ANALYTICS -->
+            <div id="tab-analytics" class="tab-content hidden space-y-4 max-w-5xl">
+                <h2 class="text-lg font-bold text-purple-300">Forex Pairs Closed Analytics</h2>
+                <div id="forex-closed-list" class="space-y-2 text-sm bg-[#130d24] p-5 rounded-xl border border-purple-900/30">
+                    <!-- Closed Forex Signals -->
                 </div>
             </div>
 
             <!-- TAB 5: LOT CALCULATOR -->
-            <div id="tab-calculator" class="tab-content hidden space-y-4">
-                <h2 class="text-lg font-bold text-purple-300">Gold & Forex Position Sizing Calculator</h2>
-                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 max-w-md space-y-4">
+            <div id="tab-calculator" class="tab-content hidden space-y-4 max-w-md">
+                <h2 class="text-lg font-bold text-purple-300">Position Size & Risk Calculator</h2>
+                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Account Balance ($)</label>
-                        <input type="number" value="1000" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                        <label class="block text-xs text-gray-400 mb-1">Select Pair / Asset</label>
+                        <select id="calc-asset" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                            <option value="XAUUSD">XAU/USD (Gold)</option>
+                            <option value="EURUSD">EUR/USD</option>
+                            <option value="GBPUSD">GBP/USD</option>
+                            <option value="BTCUSD">BTC/USD</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Risk Percentage (%)</label>
-                        <input type="number" value="2" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                        <label class="block text-xs text-gray-400 mb-1">Account Balance ($)</label>
+                        <input type="number" id="calc-balance" value="1000" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Risk per Trade (%)</label>
+                        <input type="number" id="calc-risk" value="2" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Stop Loss (Pips)</label>
-                        <input type="number" value="30" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                        <input type="number" id="calc-sl-pips" value="30" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
                     </div>
-                    <button class="w-full bg-purple-600 hover:bg-purple-700 py-2.5 rounded font-bold text-sm">Calculate Lot Size</button>
+                    <button onclick="calculateLotSize()" class="w-full bg-purple-600 hover:bg-purple-700 py-2.5 rounded-lg font-bold text-sm">Calculate Lot Size</button>
+                    
+                    <div id="calc-result" class="hidden p-3 bg-[#1c1335] rounded-lg border border-purple-500/30 text-center space-y-1">
+                        <p class="text-xs text-gray-400">Recommended Lot Size:</p>
+                        <p id="calc-lot-val" class="text-xl font-bold text-emerald-400">0.07 Lots</p>
+                        <p id="calc-risk-val" class="text-xs text-gray-400">Risk Amount: $20.00</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- TAB 6: PROFILE SETTINGS -->
-            <div id="tab-settings" class="tab-content hidden space-y-4">
-                <h2 class="text-lg font-bold text-purple-300">Profile & Subscription Management</h2>
-                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 max-w-md">
-                    <p class="text-sm text-gray-300">Manage account preferences and membership tier.</p>
+            <!-- TAB 6: PROFILE SETTINGS & VIP UPGRADE -->
+            <div id="tab-settings" class="tab-content hidden space-y-6 max-w-2xl">
+                <h2 class="text-lg font-bold text-purple-300">Profile & VIP Subscription Settings</h2>
+                
+                <!-- Profile Edit Form -->
+                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
+                    <h3 class="text-md font-semibold text-gray-200">Personal Information</h3>
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-full bg-purple-900/40 border border-purple-500/30 overflow-hidden flex items-center justify-center text-xl font-bold text-purple-300" id="profile-avatar-preview">
+                            W
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Upload Profile Image</label>
+                            <input type="file" id="avatar-input" accept="image/*" class="text-xs text-gray-400">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Full Name</label>
+                        <input type="text" id="profile-name" value="Wali UL Husnain" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Email Address</label>
+                        <input type="email" id="profile-email" value="walijuttwalijutt22@gmail.com" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Phone Number</label>
+                        <input type="text" id="profile-phone" value="03127554292" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                    </div>
+                    <button onclick="saveProfileInfo()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-xs font-bold">Save Profile Changes</button>
+                </div>
+
+                <!-- Payment Upgrade Section -->
+                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
+                    <h3 class="text-md font-bold text-amber-400">👑 Upgrade to VIP Premium Access</h3>
+                    <p class="text-xs text-gray-300">VIP Membership lene ke liye niche diye gaye EasyPaisa ya JazzCash account par payment send karke transaction details upload karein.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-[#1c1335] p-4 rounded-lg border border-purple-900/40">
+                        <div class="space-y-1">
+                            <span class="font-bold text-emerald-400">EasyPaisa Account:</span>
+                            <p>Number: <strong class="text-white">03127554292</strong></p>
+                            <p>Name: <strong class="text-white">Wali UL Hasnain</strong></p>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="font-bold text-amber-400">JazzCash Account:</span>
+                            <p>Number: <strong class="text-white">03061756478</strong></p>
+                            <p>Name: <strong class="text-white">Wali UL Hasnain</strong></p>
+                        </div>
+                    </div>
+
+                    <form id="payment-submit-form" class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Sender Name / Number</label>
+                            <input type="text" id="pay-sender" placeholder="e.g. Ali - 0300xxxxxxx" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Transaction ID (TID)</label>
+                            <input type="text" id="pay-tid" placeholder="e.g. 9821371283" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Upload Payment Screenshot</label>
+                            <input type="file" id="pay-screenshot" accept="image/*" class="text-xs text-gray-400" required>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                            Submit Payment Verification
+                        </button>
+                    </form>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Script Block -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const roleSelector = document.getElementById("role-selector");
+            const signalsFeedList = document.getElementById("signals-feed-list");
+            const adminSection = document.getElementById("admin-publish-section");
+            const userStatusBadge = document.getElementById("user-status-badge");
+            const headerUserBadge = document.getElementById("header-user-badge");
+            const signalForm = document.getElementById("signal-form");
+            const toggleSidebarBtn = document.getElementById("toggle-sidebar-btn");
+            const sidebarDrawer = document.getElementById("sidebar-drawer");
+
+            // 1. Sidebar Toggle
+            toggleSidebarBtn.addEventListener("click", () => {
+                sidebarDrawer.classList.toggle("hidden");
+            });
+
+            // 2. Tab Navigation System
+            window.switchTab = (tabName) => {
+                document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+                document.getElementById(`tab-${tabName}`).classList.remove("hidden");
+
+                if(tabName === 'chart') {
+                    loadTradingViewChart();
+                }
+
+                const navButtons = ["dashboard", "chart", "accuracy", "analytics", "calculator", "settings"];
+                navButtons.forEach(btn => {
+                    const el = document.getElementById(`nav-${btn}`);
+                    if(el) {
+                        if (btn === tabName) {
+                            el.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 font-semibold text-left";
+                        } else {
+                            el.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition";
+                        }
+                    }
+                });
+            };
+
+            // TradingView Embed Loader
+            function loadTradingViewChart() {
+                const container = document.getElementById('tradingview_chart_container');
+                container.innerHTML = '';
+                new TradingView.widget({
+                    "autosize": true,
+                    "symbol": "OANDA:XAUUSD",
+                    "interval": "60",
+                    "timezone": "Etc/UTC",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "en",
+                    "toolbar_bg": "#130d24",
+                    "enable_publishing": false,
+                    "allow_symbol_change": true,
+                    "container_id": "tradingview_chart_container"
+                });
+            }
+
+            // 3. User Signup Tracker
+            if (!localStorage.getItem("user_signup_time")) {
+                localStorage.setItem("user_signup_time", Date.now().toString());
+            }
+            const userSignupTime = parseInt(localStorage.getItem("user_signup_time"), 10);
+
+            // Get / Save Signals
+            function getSignals() {
+                const stored = localStorage.getItem("trading_signals_data");
+                if (!stored) {
+                    const now = Date.now();
+                    const initialSignals = [
+                        { id: now, pair: "XAUUSD", type: "BUY", entry: "2738.50", sl: "2725.00", tp1: "2745.00", tp2: "2755.00", tp3: "2770.00", status: "ACTIVE", result: "", timestamp: now }
+                    ];
+                    localStorage.setItem("trading_signals_data", JSON.stringify(initialSignals));
+                    return initialSignals;
+                }
+                return JSON.parse(stored);
+            }
+
+            // Render Signals
+            function renderFeed() {
+                const currentRole = roleSelector.value;
+                const allSignals = getSignals();
+
+                allSignals.sort((a, b) => a.timestamp - b.timestamp);
+                const postSignupSignals = allSignals.filter(s => s.timestamp >= userSignupTime);
+
+                if (currentRole === "ADMIN") {
+                    adminSection.classList.remove("hidden");
+                    document.getElementById("admin-payments-section").classList.remove("hidden");
+                    userStatusBadge.innerText = "Admin Panel Active";
+                    userStatusBadge.className = "text-xs bg-purple-600 text-white px-3 py-1 rounded-full font-semibold";
+                    headerUserBadge.innerText = "Admin VIP";
+                } else if (currentRole === "VIP") {
+                    adminSection.classList.add("hidden");
+                    document.getElementById("admin-payments-section").classList.add("hidden");
+                    userStatusBadge.innerText = "VIP Unlimited Member";
+                    userStatusBadge.className = "text-xs bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full font-semibold border border-amber-500/30";
+                    headerUserBadge.innerText = "VIP Member";
+                } else {
+                    adminSection.classList.add("hidden");
+                    document.getElementById("admin-payments-section").classList.add("hidden");
+                    userStatusBadge.innerText = "Free Access (First 5 Signals)";
+                    userStatusBadge.className = "text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full font-semibold border border-purple-500/30";
+                    headerUserBadge.innerText = "Free Plan";
+                }
+
+                signalsFeedList.innerHTML = "";
+                const activeSignals = allSignals.filter(s => s.status === "ACTIVE").reverse();
+
+                if (activeSignals.length === 0) {
+                    signalsFeedList.innerHTML = `<div class="text-center py-8 text-gray-400 bg-[#130d24] rounded-xl border border-purple-900/20">Koi active signal available nahi hai.</div>`;
+                } else {
+                    activeSignals.forEach((signal) => {
+                        const card = document.createElement("div");
+                        card.className = "relative bg-[#130d24] p-4 rounded-xl border border-purple-900/30 overflow-hidden shadow-md";
+
+                        let isLocked = false;
+                        if (currentRole === "FREE") {
+                            const signalIndexAfterSignup = postSignupSignals.findIndex(s => s.id === signal.id);
+                            if (signalIndexAfterSignup === -1 || signalIndexAfterSignup >= 5) {
+                                isLocked = true;
+                            }
+                        }
+
+                        const isBuy = signal.type === "BUY";
+                        const badgeClass = isBuy ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" : "text-rose-400 border-rose-500/30 bg-rose-500/10";
+
+                        if (isLocked) {
+                            card.innerHTML = `
+                                <div class="filter blur-md select-none opacity-30 flex items-center justify-between">
+                                    <div><span class="font-bold text-lg">${signal.pair}</span></div>
+                                    <span class="text-xs font-bold px-3 py-1 rounded border ${badgeClass}">${signal.type}</span>
+                                </div>
+                                <div class="absolute inset-0 bg-[#0b0813]/85 backdrop-blur-sm flex items-center justify-between p-4 z-10">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-2xl">🔒</span>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-white">Signal Locked (VIP Only)</h4>
+                                            <p class="text-xs text-gray-400">First 5 free signals limit reached.</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="switchTab('settings')" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-3 rounded-lg">Upgrade VIP</button>
+                                </div>
+                            `;
+                        } else {
+                            card.innerHTML = `
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-lg text-white">${signal.pair}</span>
+                                        <span class="text-xs font-extrabold px-3 py-1 rounded border ${badgeClass}">${signal.type}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs text-gray-300 bg-[#1c1335] p-2.5 rounded-lg border border-purple-900/20">
+                                        <div>ENTRY: <strong class="text-white">${signal.entry}</strong></div>
+                                        <div>SL: <strong class="text-rose-400">${signal.sl}</strong></div>
+                                        <div>TP1: <strong class="text-emerald-400">${signal.tp1}</strong></div>
+                                        <div>TP2: <strong class="text-emerald-400">${signal.tp2 || '-'}</strong></div>
+                                        <div>TP3: <strong class="text-emerald-400">${signal.tp3 || '-'}</strong></div>
+                                    </div>
+
+                                    ${currentRole === "ADMIN" ? `
+                                        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-purple-900/20 justify-end">
+                                            <button onclick="updateSignalStatus(${signal.id}, 'TP1 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs">TP1 Hit</button>
+                                            <button onclick="updateSignalStatus(${signal.id}, 'TP2 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs">TP2 Hit</button>
+                                            <button onclick="updateSignalStatus(${signal.id}, 'TP3 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs">TP3 Hit</button>
+                                            <button onclick="updateSignalStatus(${signal.id}, 'SL HIT')" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white px-2.5 py-1 rounded text-xs">SL Hit</button>
+                                            <button onclick="deleteSignal(${signal.id})" class="bg-gray-700 hover:bg-gray-600 text-white px-2.5 py-1 rounded text-xs">Delete</button>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }
+
+                        signalsFeedList.appendChild(card);
+                    });
+                }
+
+                renderClosedLogs();
+                renderPendingPayments();
+            }
+
+            // Publish Signal
+            signalForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const signals = getSignals();
+
+                const newSignal = {
+                    id: Date.now(),
+                    pair: document.getElementById("signal-pair").value.toUpperCase(),
+                    type: document.getElementById("signal-type").value,
+                    entry: document.getElementById("signal-entry").value,
+                    sl: document.getElementById("signal-sl").value,
+                    tp1: document.getElementById("signal-tp1").value,
+                    tp2: document.getElementById("signal-tp2").value,
+                    tp3: document.getElementById("signal-tp3").value,
+                    status: "ACTIVE",
+                    result: "",
+                    timestamp: Date.now()
+                };
+
+                signals.push(newSignal);
+                localStorage.setItem("trading_signals_data", JSON.stringify(signals));
+                signalForm.reset();
+                renderFeed();
+                alert("Signal Published Successfully!");
+            });
+
+            // Status Updates
+            window.updateSignalStatus = (id, statusResult) => {
+                let signals = getSignals();
+                const signal = signals.find(s => s.id === id);
+                if (signal) {
+                    signal.status = "CLOSED";
+                    signal.result = statusResult;
+                    localStorage.setItem("trading_signals_data", JSON.stringify(signals));
+                    renderFeed();
+                }
+            };
+
+            window.deleteSignal = (id) => {
+                if (confirm("Delete this signal?")) {
+                    let signals = getSignals();
+                    signals = signals.filter(s => s.id !== id);
+                    localStorage.setItem("trading_signals_data", JSON.stringify(signals));
+                    renderFeed();
+                }
+            };
+
+            // Render Closed Analytics
+            function renderClosedLogs() {
+                const signals = getSignals().filter(s => s.status === "CLOSED");
+                const goldClosedList = document.getElementById("gold-closed-list");
+                const forexClosedList = document.getElementById("forex-closed-list");
+
+                goldClosedList.innerHTML = "";
+                forexClosedList.innerHTML = "";
+
+                let goldWins = 0, goldTotal = 0;
+
+                signals.forEach(s => {
+                    const isWin = s.result.includes("TP");
+                    const resBadge = isWin ? `<span class="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">${s.result}</span>` : `<span class="text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/30 font-bold">${s.result}</span>`;
+
+                    const row = `
+                        <div class="flex items-center justify-between p-2.5 bg-[#1c1335] rounded-lg border border-purple-900/20">
+                            <div>
+                                <span class="font-bold text-white">${s.pair}</span> (${s.type}) | Entry: ${s.entry}
+                            </div>
+                            <div>${resBadge}</div>
+                        </div>
+                    `;
+
+                    if (s.pair.includes("XAU") || s.pair.includes("GOLD")) {
+                        goldTotal++;
+                        if (isWin) goldWins++;
+                        goldClosedList.innerHTML += row;
+                    } else {
+                        forexClosedList.innerHTML += row;
+                    }
+                });
+
+                document.getElementById("gold-trades-count").innerText = goldTotal;
+                document.getElementById("gold-wins-loss-stat").innerText = `${goldWins} / ${goldTotal - goldWins}`;
+                const winrate = goldTotal > 0 ? Math.round((goldWins / goldTotal) * 100) : 100;
+                document.getElementById("gold-winrate-stat").innerText = `${winrate}%`;
+            }
+
+            // Position Size Calculator
+            window.calculateLotSize = () => {
+                const balance = parseFloat(document.getElementById("calc-balance").value) || 1000;
+                const riskPercent = parseFloat(document.getElementById("calc-risk").value) || 2;
+                const slPips = parseFloat(document.getElementById("calc-sl-pips").value) || 30;
+
+                const riskAmount = (balance * riskPercent) / 100;
+                const lotSize = (riskAmount / (slPips * 10)).toFixed(2);
+
+                document.getElementById("calc-lot-val").innerText = `${lotSize} Lots`;
+                document.getElementById("calc-risk-val").innerText = `Risk Amount: $${riskAmount.toFixed(2)}`;
+                document.getElementById("calc-result").classList.remove("hidden");
+            };
+
+            // Payment Submissions
+            document.getElementById("payment-submit-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                const sender = document.getElementById("pay-sender").value;
+                const tid = document.getElementById("pay-tid").value;
+
+                const pendingPayments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
+                pendingPayments.push({ id: Date.now(), sender, tid, date: new Date().toLocaleDateString() });
+                localStorage.setItem("pending_payments", JSON.stringify(pendingPayments));
+
+                alert("Payment Verification Request Submitted! Status: In Review.");
+                e.target.reset();
+                renderPendingPayments();
+            });
+
+            function renderPendingPayments() {
+                const list = document.getElementById("pending-payments-list");
+                const payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
+                list.innerHTML = "";
+
+                if (payments.length === 0) {
+                    list.innerHTML = `<p class="text-xs text-gray-400">No pending verification requests.</p>`;
+                    return;
+                }
+
+                payments.forEach(p => {
+                    list.innerHTML += `
+                        <div class="flex items-center justify-between p-3 bg-[#1c1335] rounded-lg border border-purple-900/30 text-xs">
+                            <div>
+                                <p class="font-bold text-white">Sender: ${p.sender}</p>
+                                <p class="text-gray-400">TID: ${p.tid} | Date: ${p.date}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="approvePayment(${p.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-bold">Approve</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            window.approvePayment = (id) => {
+                let payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
+                payments = payments.filter(p => p.id !== id);
+                localStorage.setItem("pending_payments", JSON.stringify(payments));
+                alert("Payment Approved! User upgraded to VIP.");
+                renderFeed();
+            };
+
+            roleSelector.addEventListener("change", renderFeed);
+            renderFeed();
+        });
+    </script>
 </body>
 </html>
