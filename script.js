@@ -152,7 +152,7 @@ signalForm?.addEventListener("submit", (e) => {
   });
 });
 
-// Realtime Signal Feed Listener (5 Free Signals Limit per User)
+// Realtime Signal Feed Listener (Old 5 Signals Free, New Signals Locked)
 const signalsRef = ref(db, "signals");
 onValue(signalsRef, (snapshot) => {
   if (!signalsContainer) return;
@@ -167,8 +167,8 @@ onValue(signalsRef, (snapshot) => {
   const currentUser = auth.currentUser;
   const isAdminOrVIP = currentUser && (currentUser.email.toLowerCase() === "admin@tradingpanda.com" || currentUser.isVIP);
   
-  const FREE_LIMIT = 5; 
   const signalList = Object.values(data).reverse();
+  const totalSignals = signalList.length;
 
   signalList.forEach((sig, index) => {
     const cardWrapper = document.createElement("div");
@@ -176,7 +176,10 @@ onValue(signalsRef, (snapshot) => {
     cardWrapper.style.marginBottom = "15px";
 
     const card = document.createElement("div");
-    const isLocked = !isAdminOrVIP && index >= FREE_LIMIT;
+    
+    // Navo (Latest) Signal lock thashe, juno 5 signals free raheshe
+    const isNewSignal = index < (totalSignals - 5);
+    const isLocked = !isAdminOrVIP && isNewSignal;
     
     card.className = `signal-card ${sig.action.toLowerCase()} ${isLocked ? 'locked' : ''}`;
     
@@ -207,8 +210,8 @@ onValue(signalsRef, (snapshot) => {
       const lockOverlay = document.createElement("div");
       lockOverlay.className = "lock-overlay";
       lockOverlay.innerHTML = `
-        <p>🔒 Free Limit Reached (5/5 Signals Used)</p>
-        <p style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">Upgrade to VIP for Unlimited Lifetime Signals</p>
+        <p>🔒 New VIP Signal Locked</p>
+        <p style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">Upgrade to VIP to access fresh live signals instantly</p>
         <button class="unlock-btn" onclick="document.querySelector('[data-tab=\\'premium\\']').click()">Upgrade to VIP</button>
       `;
       cardWrapper.appendChild(lockOverlay);
