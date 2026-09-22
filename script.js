@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -28,8 +28,10 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const signalForm = document.getElementById("signal-form");
 const userBadge = document.getElementById("user-badge");
+const tidForm = document.getElementById("tid-form");
+const paymentRequestsContainer = document.getElementById("payment-requests-container");
 
-// Direct Universal Sidebar Logic (Click Fix)
+// Direct Sidebar Logic
 document.addEventListener("click", (e) => {
   const sidebar = document.getElementById("sidebar");
   const toggleBtn = e.target.closest("#sidebar-toggle");
@@ -42,7 +44,6 @@ document.addEventListener("click", (e) => {
     sidebar?.classList.remove("open");
   }
 
-  // Navigation Tab Switching
   if (menuItem) {
     const targetTab = menuItem.getAttribute("data-tab");
 
@@ -60,7 +61,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Position / Lot Size Calculator
+// Lot Size Calculator
 const calcBtn = document.getElementById("calculate-btn");
 if (calcBtn) {
   calcBtn.addEventListener("click", () => {
@@ -71,10 +72,8 @@ if (calcBtn) {
     const riskAmount = (balance * riskPercent) / 100;
     const lotSize = (riskAmount / (slPips * 10)).toFixed(2);
 
-    const riskDisplay = document.getElementById("risk-amount");
-    const lotDisplay = document.getElementById("lot-result");
-    if (riskDisplay) riskDisplay.innerText = riskAmount.toFixed(2);
-    if (lotDisplay) lotDisplay.innerText = `${lotSize} Lot`;
+    document.getElementById("risk-amount").innerText = riskAmount.toFixed(2);
+    document.getElementById("lot-result").innerText = `${lotSize} Lot`;
   });
 }
 
@@ -112,7 +111,7 @@ if (logoutBtn) {
   });
 }
 
-// Auth State Observer
+// Auth Observer
 onAuthStateChanged(auth, (user) => {
   if (user) {
     if (authSection) authSection.classList.add("hidden");
@@ -124,11 +123,12 @@ onAuthStateChanged(auth, (user) => {
         userBadge.innerText = "Admin VIP";
         userBadge.className = "badge purple";
       }
+      loadPaymentRequests();
     } else {
       if (adminPanel) adminPanel.classList.add("hidden");
       if (userBadge) {
-        userBadge.innerText = "Free Member";
-        userBadge.className = "badge free";
+        userBadge.innerText = user.isVIP ? "VIP Member 👑" : "Free Member";
+        userBadge.className = user.isVIP ? "badge purple" : "badge free";
       }
     }
   } else {
@@ -142,7 +142,73 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Admin Post Signal
+// Submit Payment TID (User)
+if (tidForm) {
+  tidForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const currentUser = auth.currentUser;
+    if (!currentUser) return alert("Please login first!");
+
+    const tidValue = document.getElementById("tid-input").value.trim();
+    if (!tidValue) return alert("Please enter a valid TID number!");
+
+    const reqRef = ref(db, `payment_requests/${currentUser.uid}`);
+    set(reqRef, {
+      email: currentUser.email,
+      tid: tidValue,
+      timestamp: Date.now(),
+      status: "pending"
+    }).then(() => {
+      alert("TID Submitted Successfully! Admin will verify and activate your VIP access soon.");
+      tidForm.reset();
+    }).catch(err => alert(err.message));
+  });
+}
+
+// Load Pending Payment Requests (Admin Only)
+function loadPaymentRequests() {
+  const reqsRef = ref(db, "payment_requests");
+  onValue(reqsRef, (snapshot) => {
+    if (!paymentRequestsContainer) return;
+    paymentRequestsContainer.innerHTML = "";
+    const data = snapshot.val();
+
+    if (!data) {
+      paymentRequestsContainer.innerHTML = "<p style='color:var(--text-muted); font-size:0.9rem;'>No pending VIP payment requests right now.</p>";
+      return;
+    }
+
+    Object.keys(data).forEach((uid) => {
+      const item = data[uid];
+      const reqCard = document.createElement("div");
+      reqCard.style.cssText = "background:rgba(255,255,255,0.03); border:1px solid var(--border-color); padding:10px 15px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;";
+      
+      reqCard.innerHTML = `
+        <div>
+          <strong>${item.email}</strong><br>
+          <span style="color:#00e676; font-size:0.85rem;">TID: ${item.tid}</span>
+        </div>
+        <div>
+          <button style="background:#00e676; color:#000; border:none; padding:5px 12px; border-radius:5px; font-weight:bold; cursor:pointer; margin-right:5px;" onclick="approveVIP('${uid}')">Approve</button>
+          <button style="background:#ff1744; color:#fff; border:none; padding:5px 12px; border-radius:5px; font-weight:bold; cursor:pointer;" onclick="rejectVIP('${uid}')">Reject</button>
+        </div>
+      `;
+      paymentRequestsContainer.appendChild(reqCard);
+    });
+  });
+}
+
+window.approveVIP = (uid) => {
+  remove(ref(db, `payment_requests/${uid}`));
+  alert("Payment Approved! VIP activated.");
+};
+
+window.rejectVIP = (uid) => {
+  remove(ref(db, `payment_requests/${uid}`));
+  alert("Payment Request Rejected.");
+};
+
+// Post Signal (Admin)
 if (signalForm) {
   signalForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -171,7 +237,7 @@ if (signalForm) {
   });
 }
 
-// Realtime Signals (Latest Locked, Old 5 Free)
+// Realtime Signal Feed Listener
 const signalsRef = ref(db, "signals");
 onValue(signalsRef, (snapshot) => {
   if (!signalsContainer) return;
@@ -186,10 +252,10 @@ onValue(signalsRef, (snapshot) => {
   const currentUser = auth.currentUser;
   const isAdminOrVIP = currentUser && (currentUser.email.toLowerCase() === "admin@tradingpanda.com" || currentUser.isVIP);
   
-  const signalList = Object.values(data).reverse();
-  const totalSignals = signalList.length;
+  const entries = Object.entries(data).reverse();
+  const totalSignals = entries.length;
 
-  signalList.forEach((sig, index) => {
+  entries.forEach(([key, sig], index) => {
     const cardWrapper = document.createElement("div");
     cardWrapper.style.position = "relative";
     cardWrapper.style.marginBottom = "15px";
