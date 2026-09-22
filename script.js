@@ -29,18 +29,30 @@ const passwordInput = document.getElementById("password");
 const signalForm = document.getElementById("signal-form");
 const userBadge = document.getElementById("user-badge");
 
-// Sidebar Drawer Navigation Toggle
+// Sidebar Drawer Navigation Logic
 const sidebar = document.getElementById("sidebar");
 const sidebarToggle = document.getElementById("sidebar-toggle");
 const sidebarClose = document.getElementById("sidebar-close");
 const menuItems = document.querySelectorAll(".menu-item");
 
-sidebarToggle?.addEventListener("click", () => {
-  sidebar?.classList.add("open");
-});
+if (sidebarToggle) {
+  sidebarToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sidebar.classList.add("open");
+  });
+}
 
-sidebarClose?.addEventListener("click", () => {
-  sidebar?.classList.remove("open");
+if (sidebarClose) {
+  sidebarClose.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+  });
+}
+
+// Close sidebar when clicking outside
+document.addEventListener("click", (e) => {
+  if (sidebar && sidebar.classList.contains("open") && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
+    sidebar.classList.remove("open");
+  }
 });
 
 menuItems.forEach(item => {
@@ -57,75 +69,83 @@ menuItems.forEach(item => {
     const selectedTab = document.getElementById(`${targetTab}-tab`);
     if (selectedTab) selectedTab.classList.remove("hidden");
 
-    sidebar?.classList.remove("open");
+    sidebar.classList.remove("open");
   });
 });
 
-// Position Size & Lot Size Calculator Logic
+// Position Size Calculator
 const calcBtn = document.getElementById("calculate-btn");
-calcBtn?.addEventListener("click", () => {
-  const balance = parseFloat(document.getElementById("calc-balance").value) || 0;
-  const riskPercent = parseFloat(document.getElementById("calc-risk").value) || 0;
-  const slPips = parseFloat(document.getElementById("calc-sl-pips").value) || 1;
+if (calcBtn) {
+  calcBtn.addEventListener("click", () => {
+    const balance = parseFloat(document.getElementById("calc-balance").value) || 0;
+    const riskPercent = parseFloat(document.getElementById("calc-risk").value) || 0;
+    const slPips = parseFloat(document.getElementById("calc-sl-pips").value) || 1;
 
-  const riskAmount = (balance * riskPercent) / 100;
-  const lotSize = (riskAmount / (slPips * 10)).toFixed(2);
+    const riskAmount = (balance * riskPercent) / 100;
+    const lotSize = (riskAmount / (slPips * 10)).toFixed(2);
 
-  document.getElementById("risk-amount").innerText = riskAmount.toFixed(2);
-  document.getElementById("lot-result").innerText = `${lotSize} Lot`;
-});
+    document.getElementById("risk-amount").innerText = riskAmount.toFixed(2);
+    document.getElementById("lot-result").innerText = `${lotSize} Lot`;
+  });
+}
 
-// Authentication Handlers
-signupBtn?.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  if (!email || !password) return alert("Please enter email and password");
-  try {
-    await createUserWithEmailAndPassword(auth, email, password);
-    alert("Account created successfully!");
-  } catch (error) {
-    alert(error.message);
-  }
-});
+// Auth Logic
+if (signupBtn) {
+  signupBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) return alert("Please enter email and password");
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("Account created successfully!");
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
 
-loginBtn?.addEventListener("click", async () => {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
-  if (!email || !password) return alert("Please enter email and password");
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    alert(error.message);
-  }
-});
+if (loginBtn) {
+  loginBtn.addEventListener("click", async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) return alert("Please enter email and password");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
 
-logoutBtn?.addEventListener("click", () => {
-  signOut(auth);
-});
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth);
+  });
+}
 
-// Auth State Tracking
+// Auth Observer
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    authSection?.classList.add("hidden");
-    logoutBtn?.classList.remove("hidden");
+    if (authSection) authSection.classList.add("hidden");
+    if (logoutBtn) logoutBtn.classList.remove("hidden");
 
     if (user.email.toLowerCase() === "admin@tradingpanda.com") {
-      adminPanel?.classList.remove("hidden");
+      if (adminPanel) adminPanel.classList.remove("hidden");
       if (userBadge) {
         userBadge.innerText = "Admin VIP";
         userBadge.className = "badge purple";
       }
     } else {
-      adminPanel?.classList.add("hidden");
+      if (adminPanel) adminPanel.classList.add("hidden");
       if (userBadge) {
         userBadge.innerText = "Free Member";
         userBadge.className = "badge free";
       }
     }
   } else {
-    authSection?.classList.remove("hidden");
-    adminPanel?.classList.add("hidden");
-    logoutBtn?.classList.add("hidden");
+    if (authSection) authSection.classList.remove("hidden");
+    if (adminPanel) adminPanel.classList.add("hidden");
+    if (logoutBtn) logoutBtn.classList.add("hidden");
     if (userBadge) {
       userBadge.innerText = "Free Plan";
       userBadge.className = "badge free";
@@ -133,36 +153,36 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Post Signal (Admin Only)
-signalForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const pair = document.getElementById("pair").value;
-  const action = document.getElementById("action").value;
-  const entry = document.getElementById("entry").value;
-  const sl = document.getElementById("sl").value;
-  const tp = document.getElementById("tp").value;
-  const tp2 = document.getElementById("tp2").value || "N/A";
+// Post Signal
+if (signalForm) {
+  signalForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const pair = document.getElementById("pair").value;
+    const action = document.getElementById("action").value;
+    const entry = document.getElementById("entry").value;
+    const sl = document.getElementById("sl").value;
+    const tp = document.getElementById("tp").value;
 
-  const signalRef = ref(db, "signals");
-  const newSignalRef = push(signalRef);
-  
-  set(newSignalRef, {
-    pair: pair.toUpperCase(),
-    action,
-    entry,
-    sl,
-    tp,
-    tp2,
-    timestamp: Date.now()
-  }).then(() => {
-    alert("Signal Published!");
-    signalForm.reset();
-  }).catch((err) => {
-    alert(err.message);
+    const signalRef = ref(db, "signals");
+    const newSignalRef = push(signalRef);
+    
+    set(newSignalRef, {
+      pair: pair.toUpperCase(),
+      action,
+      entry,
+      sl,
+      tp,
+      timestamp: Date.now()
+    }).then(() => {
+      alert("Signal Published!");
+      signalForm.reset();
+    }).catch((err) => {
+      alert(err.message);
+    });
   });
-});
+}
 
-// Realtime Signal Feed Listener (Old 5 Signals Free, New Signals Locked)
+// Signal Feed Listener (Latest Signals Locked, Old 5 Free)
 const signalsRef = ref(db, "signals");
 onValue(signalsRef, (snapshot) => {
   if (!signalsContainer) return;
@@ -187,7 +207,7 @@ onValue(signalsRef, (snapshot) => {
 
     const card = document.createElement("div");
     
-    // Naye (Latest) Signals lock honge, purane 5 free rahenge
+    // Naye Signals Lock, purane 5 free
     const isNewSignal = index < (totalSignals - 5);
     const isLocked = !isAdminOrVIP && isNewSignal;
     
@@ -195,22 +215,13 @@ onValue(signalsRef, (snapshot) => {
     
     card.innerHTML = `
       <div class="signal-header">
-        <span class="pair-title">${sig.pair}</span>
-        <span class="badge-action ${sig.action.toLowerCase()}">${sig.action}</span>
+        <span class="pair-title" style="font-weight:bold; font-size:1.1rem;">${sig.pair}</span>
+        <span class="badge ${sig.action.toLowerCase() === 'buy' ? 'green' : 'red'}" style="float:right;">${sig.action}</span>
       </div>
-      <div class="signal-details">
-        <div class="detail-box">
-          <span>ENTRY</span>
-          <strong>${sig.entry}</strong>
-        </div>
-        <div class="detail-box">
-          <span>STOP LOSS</span>
-          <strong class="red">${sig.sl}</strong>
-        </div>
-        <div class="detail-box">
-          <span>TAKE PROFIT 1</span>
-          <strong class="green">${sig.tp}</strong>
-        </div>
+      <div class="signal-details" style="display:flex; justify-content:space-between; margin-top:10px;">
+        <div><span>ENTRY: </span><strong>${sig.entry}</strong></div>
+        <div><span>SL: </span><strong class="red">${sig.sl}</strong></div>
+        <div><span>TP: </span><strong class="green">${sig.tp}</strong></div>
       </div>
     `;
 
@@ -220,9 +231,8 @@ onValue(signalsRef, (snapshot) => {
       const lockOverlay = document.createElement("div");
       lockOverlay.className = "lock-overlay";
       lockOverlay.innerHTML = `
-        <p>🔒 New VIP Signal Locked</p>
-        <p style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">Upgrade to VIP to access fresh live signals instantly</p>
-        <button class="unlock-btn" onclick="document.querySelector('[data-tab=\\'premium\\']').click()">Upgrade to VIP</button>
+        <p style="color:#fff; font-weight:bold;">🔒 New VIP Signal Locked</p>
+        <button class="unlock-btn" style="margin-top:8px;" onclick="document.querySelector('[data-tab=\\'premium\\']').click()">Upgrade to VIP</button>
       `;
       cardWrapper.appendChild(lockOverlay);
     }
