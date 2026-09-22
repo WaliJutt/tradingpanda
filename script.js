@@ -30,8 +30,9 @@ const signalForm = document.getElementById("signal-form");
 const userBadge = document.getElementById("user-badge");
 const tidForm = document.getElementById("tid-form");
 const paymentRequestsContainer = document.getElementById("payment-requests-container");
+const adminRequestsMenuItem = document.getElementById("admin-requests-menu-item");
 
-// Direct Sidebar Logic
+// Direct Universal Sidebar Logic
 document.addEventListener("click", (e) => {
   const sidebar = document.getElementById("sidebar");
   const toggleBtn = e.target.closest("#sidebar-toggle");
@@ -61,7 +62,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Lot Size Calculator
+// Position Size / Lot Calculator
 const calcBtn = document.getElementById("calculate-btn");
 if (calcBtn) {
   calcBtn.addEventListener("click", () => {
@@ -111,7 +112,7 @@ if (logoutBtn) {
   });
 }
 
-// Auth Observer
+// Auth State Observer
 onAuthStateChanged(auth, (user) => {
   if (user) {
     if (authSection) authSection.classList.add("hidden");
@@ -119,6 +120,7 @@ onAuthStateChanged(auth, (user) => {
 
     if (user.email.toLowerCase() === "admin@tradingpanda.com") {
       if (adminPanel) adminPanel.classList.remove("hidden");
+      if (adminRequestsMenuItem) adminRequestsMenuItem.classList.remove("hidden");
       if (userBadge) {
         userBadge.innerText = "Admin VIP";
         userBadge.className = "badge purple";
@@ -126,6 +128,7 @@ onAuthStateChanged(auth, (user) => {
       loadPaymentRequests();
     } else {
       if (adminPanel) adminPanel.classList.add("hidden");
+      if (adminRequestsMenuItem) adminRequestsMenuItem.classList.add("hidden");
       if (userBadge) {
         userBadge.innerText = user.isVIP ? "VIP Member 👑" : "Free Member";
         userBadge.className = user.isVIP ? "badge purple" : "badge free";
@@ -134,6 +137,7 @@ onAuthStateChanged(auth, (user) => {
   } else {
     if (authSection) authSection.classList.remove("hidden");
     if (adminPanel) adminPanel.classList.add("hidden");
+    if (adminRequestsMenuItem) adminRequestsMenuItem.classList.add("hidden");
     if (logoutBtn) logoutBtn.classList.add("hidden");
     if (userBadge) {
       userBadge.innerText = "Free Plan";
@@ -200,7 +204,7 @@ function loadPaymentRequests() {
 
 window.approveVIP = (uid) => {
   remove(ref(db, `payment_requests/${uid}`));
-  alert("Payment Approved! VIP activated.");
+  alert("Payment Approved! VIP status granted.");
 };
 
 window.rejectVIP = (uid) => {
