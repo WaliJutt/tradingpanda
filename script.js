@@ -28,35 +28,51 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const signalForm = document.getElementById("signal-form");
 const userBadge = document.getElementById("user-badge");
-const userEmailDisplay = document.getElementById("user-email-display");
-const userRoleDisplay = document.getElementById("user-role-display");
 
-// Tab Navigation Logic
-const tabButtons = document.querySelectorAll(".tab-btn");
-const tabContents = document.querySelectorAll(".tab-content");
+// Sidebar Drawer Navigation Toggle
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebar-toggle");
+const sidebarClose = document.getElementById("sidebar-close");
+const menuItems = document.querySelectorAll(".menu-item");
 
-tabButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    const targetTab = button.getAttribute("data-tab");
+sidebarToggle?.addEventListener("click", () => {
+  sidebar?.classList.add("open");
+});
 
-    tabButtons.forEach(btn => btn.classList.remove("active"));
-    tabContents.forEach(content => {
+sidebarClose?.addEventListener("click", () => {
+  sidebar?.classList.remove("open");
+});
+
+menuItems.forEach(item => {
+  item.addEventListener("click", () => {
+    const targetTab = item.getAttribute("data-tab");
+
+    menuItems.forEach(i => i.classList.remove("active"));
+    item.classList.add("active");
+
+    document.querySelectorAll(".tab-content").forEach(content => {
       content.classList.add("hidden");
-      content.classList.remove("active-tab");
     });
 
-    button.classList.add("active");
-    
-    if (targetTab === "signals") {
-      document.getElementById("signals-tab")?.classList.remove("hidden");
-    } else if (targetTab === "analytics") {
-      document.getElementById("analytics-tab")?.classList.remove("hidden");
-    } else if (targetTab === "premium") {
-      document.getElementById("premium-tab")?.classList.remove("hidden");
-    } else if (targetTab === "profile") {
-      document.getElementById("profile-tab")?.classList.remove("hidden");
-    }
+    const selectedTab = document.getElementById(`${targetTab}-tab`);
+    if (selectedTab) selectedTab.classList.remove("hidden");
+
+    sidebar?.classList.remove("open");
   });
+});
+
+// Position Size & Lot Size Calculator Logic
+const calcBtn = document.getElementById("calculate-btn");
+calcBtn?.addEventListener("click", () => {
+  const balance = parseFloat(document.getElementById("calc-balance").value) || 0;
+  const riskPercent = parseFloat(document.getElementById("calc-risk").value) || 0;
+  const slPips = parseFloat(document.getElementById("calc-sl-pips").value) || 1;
+
+  const riskAmount = (balance * riskPercent) / 100;
+  const lotSize = (riskAmount / (slPips * 10)).toFixed(2);
+
+  document.getElementById("risk-amount").innerText = riskAmount.toFixed(2);
+  document.getElementById("lot-result").innerText = `${lotSize} Lot`;
 });
 
 // Authentication Handlers
@@ -92,30 +108,24 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     authSection?.classList.add("hidden");
     logoutBtn?.classList.remove("hidden");
-    if (userEmailDisplay) userEmailDisplay.innerText = user.email;
 
-    // Check if Admin
     if (user.email.toLowerCase() === "admin@tradingpanda.com") {
       adminPanel?.classList.remove("hidden");
       if (userBadge) {
         userBadge.innerText = "Admin VIP";
         userBadge.className = "badge purple";
       }
-      if (userRoleDisplay) userRoleDisplay.innerText = "Administrator";
     } else {
       adminPanel?.classList.add("hidden");
       if (userBadge) {
         userBadge.innerText = "Free Member";
         userBadge.className = "badge free";
       }
-      if (userRoleDisplay) userRoleDisplay.innerText = "Free Member";
     }
   } else {
     authSection?.classList.remove("hidden");
     adminPanel?.classList.add("hidden");
     logoutBtn?.classList.add("hidden");
-    if (userEmailDisplay) userEmailDisplay.innerText = "Not logged in";
-    if (userRoleDisplay) userRoleDisplay.innerText = "Guest";
     if (userBadge) {
       userBadge.innerText = "Free Plan";
       userBadge.className = "badge free";
@@ -177,7 +187,7 @@ onValue(signalsRef, (snapshot) => {
 
     const card = document.createElement("div");
     
-    // Navo (Latest) Signal lock thashe, juno 5 signals free raheshe
+    // Naye (Latest) Signals lock honge, purane 5 free rahenge
     const isNewSignal = index < (totalSignals - 5);
     const isLocked = !isAdminOrVIP && isNewSignal;
     
