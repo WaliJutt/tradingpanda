@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Panda - Professional VIP Portal</title>
+    <title>Trading Panda - VIP Trading Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
@@ -20,14 +20,14 @@
             </h1>
         </div>
 
-        <!-- Live Ticker -->
+        <!-- Real-time Live Price Ticker -->
         <div class="hidden lg:flex items-center gap-6 text-xs font-semibold bg-[#1c1335]/70 px-4 py-2 rounded-lg border border-purple-900/30">
-            <div>XAU/USD <span class="text-emerald-400 ml-1 font-bold">$2,738.50 ▲ +0.45%</span></div>
-            <div>EUR/USD <span class="text-rose-400 ml-1 font-bold">$1.0820 ▼ -0.12%</span></div>
-            <div>BTC/USD <span class="text-emerald-400 ml-1 font-bold">$68,450.00 ▲ +2.10%</span></div>
+            <div>XAU/USD <span id="ticker-xau" class="text-emerald-400 ml-1 font-bold">Loading...</span></div>
+            <div>EUR/USD <span id="ticker-eur" class="text-emerald-400 ml-1 font-bold">Loading...</span></div>
+            <div>BTC/USD <span id="ticker-btc" class="text-emerald-400 ml-1 font-bold">Loading...</span></div>
         </div>
 
-        <!-- Role Selector Switcher -->
+        <!-- Role Selector & Logout Controls -->
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-2 bg-[#1c1335] px-3 py-1.5 rounded-lg border border-purple-900/40">
                 <label class="text-[11px] text-gray-400 font-medium">View As:</label>
@@ -37,16 +37,16 @@
                     <option value="VIP">VIP Member</option>
                 </select>
             </div>
-            <span id="header-user-badge" class="bg-purple-600 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider hidden sm:inline-block">
-                Admin VIP
-            </span>
+            <button onclick="handleLogout()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                🚪 Logout
+            </button>
         </div>
     </header>
 
-    <!-- Main Workspace Container -->
+    <!-- Main Workspace Layout -->
     <div class="flex flex-1 overflow-hidden relative">
 
-        <!-- Sidebar Navigation Drawer -->
+        <!-- Sidebar Drawer Navigation -->
         <aside id="sidebar-drawer" class="w-64 bg-[#120b22] border-r border-purple-900/30 flex flex-col justify-between p-4 z-20 shrink-0">
             <div class="space-y-6">
                 <div class="text-xs font-bold text-gray-400 uppercase tracking-wider px-3">
@@ -69,12 +69,11 @@
                         🧮 <span>Gold & Forex Lot Calculator</span>
                     </button>
                     <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition">
-                        ⚙️ <span>Profile Settings</span>
+                        ⚙️ <span>Profile & Upgrade VIP</span>
                     </button>
                 </nav>
             </div>
 
-            <!-- Upgrade Plan Button -->
             <div id="sidebar-upgrade-box" class="pt-4 border-t border-purple-900/30">
                 <button onclick="switchTab('settings')" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg transition text-xs">
                     👑 Upgrade Your Plan (VIP)
@@ -82,7 +81,7 @@
             </div>
         </aside>
 
-        <!-- Main Body Content Area -->
+        <!-- Main Body Content -->
         <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
 
             <!-- TAB 1: DASHBOARD & LIVE SIGNALS -->
@@ -94,7 +93,7 @@
                     </h2>
                     <div class="flex items-center gap-2">
                         <span id="user-status-badge" class="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full font-semibold border border-purple-500/30">
-                            Free Access (First 5 Signals)
+                            Free Plan
                         </span>
                         <span class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-semibold border border-emerald-500/30 flex items-center gap-1.5">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> LIVE
@@ -102,9 +101,9 @@
                     </div>
                 </div>
 
-                <!-- Signal Feed Cards Container -->
+                <!-- Signals Container -->
                 <div id="signals-feed-list" class="space-y-4 max-w-4xl">
-                    <!-- Dynamic Signals Rendered via Javascript -->
+                    <!-- Dynamic Signals -->
                 </div>
 
                 <!-- Admin Publish Signal Form -->
@@ -164,8 +163,8 @@
                     <h3 class="text-md font-bold text-amber-400 flex items-center gap-2">
                         💳 Admin: Pending Payment Verifications
                     </h3>
-                    <div id="pending-payments-list" class="space-y-3">
-                        <!-- Pending Payments Loaded Dynamically -->
+                    <div id="pending-payments-list" class="space-y-4">
+                        <!-- Pending Payments with Image Screenshots -->
                     </div>
                 </div>
 
@@ -174,14 +173,12 @@
             <!-- TAB 2: TRADINGVIEW LIVE CHART -->
             <div id="tab-chart" class="tab-content hidden space-y-4 max-w-5xl">
                 <h2 class="text-lg font-bold text-purple-300">TradingView Live Gold Chart</h2>
-                <div class="bg-[#130d24] p-2 rounded-xl border border-purple-900/30 h-[550px] w-full" id="tradingview_chart_container">
-                    <!-- Embedded Chart Widget -->
-                </div>
+                <div class="bg-[#130d24] p-2 rounded-xl border border-purple-900/30 h-[550px] w-full" id="tradingview_chart_container"></div>
             </div>
 
-            <!-- TAB 3: GOLD ACCURACY & WIN RATE -->
+            <!-- TAB 3: GOLD ACCURACY -->
             <div id="tab-accuracy" class="tab-content hidden space-y-4 max-w-5xl">
-                <h2 class="text-lg font-bold text-purple-300">Gold Performance & Closed Trade History</h2>
+                <h2 class="text-lg font-bold text-purple-300">Gold Performance & Closed Trades</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 text-center">
                         <p class="text-xs text-gray-400">Gold Win Rate</p>
@@ -196,21 +193,16 @@
                         <p id="gold-wins-loss-stat" class="text-2xl font-bold text-blue-400 mt-1">0 / 0</p>
                     </div>
                 </div>
-
                 <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 space-y-3">
                     <h3 class="text-sm font-bold text-gray-300">Closed Gold Signals Log</h3>
-                    <div id="gold-closed-list" class="space-y-2 text-sm">
-                        <!-- Closed Gold Signals -->
-                    </div>
+                    <div id="gold-closed-list" class="space-y-2 text-sm"></div>
                 </div>
             </div>
 
-            <!-- TAB 4: FOREX PAIRS ANALYTICS -->
+            <!-- TAB 4: FOREX ANALYTICS -->
             <div id="tab-analytics" class="tab-content hidden space-y-4 max-w-5xl">
                 <h2 class="text-lg font-bold text-purple-300">Forex Pairs Closed Analytics</h2>
-                <div id="forex-closed-list" class="space-y-2 text-sm bg-[#130d24] p-5 rounded-xl border border-purple-900/30">
-                    <!-- Closed Forex Signals -->
-                </div>
+                <div id="forex-closed-list" class="space-y-2 text-sm bg-[#130d24] p-5 rounded-xl border border-purple-900/30"></div>
             </div>
 
             <!-- TAB 5: LOT CALCULATOR -->
@@ -248,25 +240,59 @@
                 </div>
             </div>
 
-            <!-- TAB 6: PROFILE SETTINGS & VIP UPGRADE -->
-            <div id="tab-settings" class="tab-content hidden space-y-6 max-w-2xl">
-                <h2 class="text-lg font-bold text-purple-300">Profile & VIP Subscription Settings</h2>
-                
-                <!-- Profile Edit Form -->
+            <!-- TAB 6: PROFILE SETTINGS & 3 TIERS UPGRADE -->
+            <div id="tab-settings" class="tab-content hidden space-y-6 max-w-4xl">
+                <h2 class="text-lg font-bold text-purple-300">Profile Settings & Membership Plans</h2>
+
+                <!-- Membership Plans Tiers Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Plan 1: Free -->
+                    <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs bg-gray-500/20 text-gray-300 px-2 py-1 rounded font-bold">FREE PLAN</span>
+                            <h3 class="text-xl font-bold mt-2">PKR 0</h3>
+                            <p class="text-xs text-gray-400 mt-1">First 5 signals unlocked after registration.</p>
+                        </div>
+                        <button class="w-full bg-gray-700 text-gray-300 text-xs font-bold py-2 rounded cursor-not-allowed">Default Active</button>
+                    </div>
+
+                    <!-- Plan 2: Pro Monthly -->
+                    <div class="bg-[#130d24] p-5 rounded-xl border border-purple-500/50 space-y-3 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-2 right-2 text-[10px] bg-purple-600 text-white font-bold px-2 py-0.5 rounded">POPULAR</div>
+                        <div>
+                            <span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded font-bold">PRO MONTHLY</span>
+                            <h3 class="text-xl font-bold mt-2">PKR 3,000 <span class="text-xs text-gray-400 font-normal">/ month</span></h3>
+                            <p class="text-xs text-gray-400 mt-1">Unlimited live signals, TP1-3 updates, lot calculator & charts.</p>
+                        </div>
+                        <button onclick="selectPlan('PRO MONTHLY (PKR 3,000)')" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 rounded">Select Plan</button>
+                    </div>
+
+                    <!-- Plan 3: Pro Yearly -->
+                    <div class="bg-[#130d24] p-5 rounded-xl border border-amber-500/50 space-y-3 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-2 right-2 text-[10px] bg-amber-500 text-black font-bold px-2 py-0.5 rounded">BEST VALUE</div>
+                        <div>
+                            <span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded font-bold">PRO YEARLY</span>
+                            <h3 class="text-xl font-bold mt-2">PKR 25,000 <span class="text-xs text-gray-400 font-normal">/ year</span></h3>
+                            <p class="text-xs text-gray-400 mt-1">Discounted full year unlimited VIP signals & priority support.</p>
+                        </div>
+                        <button onclick="selectPlan('PRO YEARLY (PKR 25,000)')" class="w-full bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold py-2 rounded">Select Plan</button>
+                    </div>
+                </div>
+
+                <!-- Profile Info Edit -->
                 <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
                     <h3 class="text-md font-semibold text-gray-200">Personal Information</h3>
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 rounded-full bg-purple-900/40 border border-purple-500/30 overflow-hidden flex items-center justify-center text-xl font-bold text-purple-300" id="profile-avatar-preview">
-                            W
-                        </div>
+                        <img id="profile-avatar-img" src="" class="w-16 h-16 rounded-full border border-purple-500/40 object-cover hidden">
+                        <div id="profile-avatar-placeholder" class="w-16 h-16 rounded-full bg-purple-900/40 border border-purple-500/30 flex items-center justify-center text-xl font-bold text-purple-300">W</div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Upload Profile Image</label>
+                            <label class="block text-xs text-gray-400 mb-1">Upload Profile Picture</label>
                             <input type="file" id="avatar-input" accept="image/*" class="text-xs text-gray-400">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Full Name</label>
-                        <input type="text" id="profile-name" value="Wali UL Husnain" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                        <input type="text" id="profile-name" value="Wali UL Hasnain" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Email Address</label>
@@ -279,10 +305,10 @@
                     <button onclick="saveProfileInfo()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-xs font-bold">Save Profile Changes</button>
                 </div>
 
-                <!-- Payment Upgrade Section -->
-                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
-                    <h3 class="text-md font-bold text-amber-400">👑 Upgrade to VIP Premium Access</h3>
-                    <p class="text-xs text-gray-300">VIP Membership lene ke liye niche diye gaye EasyPaisa ya JazzCash account par payment send karke transaction details upload karein.</p>
+                <!-- Payment Verification Form -->
+                <div id="payment-box" class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
+                    <h3 class="text-md font-bold text-amber-400">💳 Send Payment & Submit Proof</h3>
+                    <p class="text-xs text-gray-300">Selected Plan: <strong id="selected-plan-text" class="text-purple-300">PRO MONTHLY (PKR 3,000)</strong></p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-[#1c1335] p-4 rounded-lg border border-purple-900/40">
                         <div class="space-y-1">
@@ -299,7 +325,7 @@
 
                     <form id="payment-submit-form" class="space-y-3">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Sender Name / Number</label>
+                            <label class="block text-xs text-gray-400 mb-1">Sender Name & Number</label>
                             <input type="text" id="pay-sender" placeholder="e.g. Ali - 0300xxxxxxx" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm" required>
                         </div>
                         <div>
@@ -307,11 +333,11 @@
                             <input type="text" id="pay-tid" placeholder="e.g. 9821371283" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm" required>
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Upload Payment Screenshot</label>
+                            <label class="block text-xs text-gray-400 mb-1">Upload Payment Screenshot Proof</label>
                             <input type="file" id="pay-screenshot" accept="image/*" class="text-xs text-gray-400" required>
                         </div>
                         <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 rounded-lg text-xs transition">
-                            Submit Payment Verification
+                            Submit Payment Verification Proof
                         </button>
                     </form>
                 </div>
@@ -320,46 +346,61 @@
         </main>
     </div>
 
-    <!-- Script Block -->
+    <!-- Script Engine -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const roleSelector = document.getElementById("role-selector");
             const signalsFeedList = document.getElementById("signals-feed-list");
             const adminSection = document.getElementById("admin-publish-section");
             const userStatusBadge = document.getElementById("user-status-badge");
-            const headerUserBadge = document.getElementById("header-user-badge");
             const signalForm = document.getElementById("signal-form");
             const toggleSidebarBtn = document.getElementById("toggle-sidebar-btn");
             const sidebarDrawer = document.getElementById("sidebar-drawer");
 
-            // 1. Sidebar Toggle
-            toggleSidebarBtn.addEventListener("click", () => {
-                sidebarDrawer.classList.toggle("hidden");
-            });
+            let currentSelectedPlan = "PRO MONTHLY (PKR 3,000)";
 
-            // 2. Tab Navigation System
+            // 1. Live Crypto & Forex Ticker Fetch (Binance Public API)
+            async function fetchLiveTicker() {
+                try {
+                    const resBtc = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+                    const dataBtc = await resBtc.json();
+                    document.getElementById("ticker-btc").innerText = `$${parseFloat(dataBtc.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+                    const resPaxg = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT");
+                    const dataPaxg = await resPaxg.json();
+                    document.getElementById("ticker-xau").innerText = `$${parseFloat(dataPaxg.price).toFixed(2)}`;
+
+                    const resEur = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=EURUSDT");
+                    const dataEur = await resEur.json();
+                    document.getElementById("ticker-eur").innerText = `$${parseFloat(dataEur.price).toFixed(4)}`;
+                } catch(e) {
+                    console.log("Ticker loading...");
+                }
+            }
+            fetchLiveTicker();
+            setInterval(fetchLiveTicker, 5000);
+
+            // 2. Sidebar Toggle
+            toggleSidebarBtn.addEventListener("click", () => sidebarDrawer.classList.toggle("hidden"));
+
+            // 3. Tab Switching Logic
             window.switchTab = (tabName) => {
                 document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
                 document.getElementById(`tab-${tabName}`).classList.remove("hidden");
 
-                if(tabName === 'chart') {
-                    loadTradingViewChart();
-                }
+                if(tabName === 'chart') loadTradingViewChart();
 
                 const navButtons = ["dashboard", "chart", "accuracy", "analytics", "calculator", "settings"];
                 navButtons.forEach(btn => {
                     const el = document.getElementById(`nav-${btn}`);
                     if(el) {
-                        if (btn === tabName) {
-                            el.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 font-semibold text-left";
-                        } else {
-                            el.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition";
-                        }
+                        el.className = (btn === tabName) ? 
+                            "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 font-semibold text-left" : 
+                            "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition";
                     }
                 });
             };
 
-            // TradingView Embed Loader
             function loadTradingViewChart() {
                 const container = document.getElementById('tradingview_chart_container');
                 container.innerHTML = '';
@@ -378,13 +419,13 @@
                 });
             }
 
-            // 3. User Signup Tracker
+            // 4. Registration Timestamp
             if (!localStorage.getItem("user_signup_time")) {
                 localStorage.setItem("user_signup_time", Date.now().toString());
             }
             const userSignupTime = parseInt(localStorage.getItem("user_signup_time"), 10);
 
-            // Get / Save Signals
+            // 5. Signals Data
             function getSignals() {
                 const stored = localStorage.getItem("trading_signals_data");
                 if (!stored) {
@@ -398,7 +439,7 @@
                 return JSON.parse(stored);
             }
 
-            // Render Signals
+            // 6. Feed Render
             function renderFeed() {
                 const currentRole = roleSelector.value;
                 const allSignals = getSignals();
@@ -409,28 +450,25 @@
                 if (currentRole === "ADMIN") {
                     adminSection.classList.remove("hidden");
                     document.getElementById("admin-payments-section").classList.remove("hidden");
-                    userStatusBadge.innerText = "Admin Panel Active";
+                    userStatusBadge.innerText = "Admin Control Active";
                     userStatusBadge.className = "text-xs bg-purple-600 text-white px-3 py-1 rounded-full font-semibold";
-                    headerUserBadge.innerText = "Admin VIP";
                 } else if (currentRole === "VIP") {
                     adminSection.classList.add("hidden");
                     document.getElementById("admin-payments-section").classList.add("hidden");
-                    userStatusBadge.innerText = "VIP Unlimited Member";
+                    userStatusBadge.innerText = "VIP Unlimited Plan";
                     userStatusBadge.className = "text-xs bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full font-semibold border border-amber-500/30";
-                    headerUserBadge.innerText = "VIP Member";
                 } else {
                     adminSection.classList.add("hidden");
                     document.getElementById("admin-payments-section").classList.add("hidden");
                     userStatusBadge.innerText = "Free Access (First 5 Signals)";
                     userStatusBadge.className = "text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full font-semibold border border-purple-500/30";
-                    headerUserBadge.innerText = "Free Plan";
                 }
 
                 signalsFeedList.innerHTML = "";
                 const activeSignals = allSignals.filter(s => s.status === "ACTIVE").reverse();
 
                 if (activeSignals.length === 0) {
-                    signalsFeedList.innerHTML = `<div class="text-center py-8 text-gray-400 bg-[#130d24] rounded-xl border border-purple-900/20">Koi active signal available nahi hai.</div>`;
+                    signalsFeedList.innerHTML = `<div class="text-center py-8 text-gray-400 bg-[#130d24] rounded-xl border border-purple-900/20">No active live signals right now.</div>`;
                 } else {
                     activeSignals.forEach((signal) => {
                         const card = document.createElement("div");
@@ -439,9 +477,7 @@
                         let isLocked = false;
                         if (currentRole === "FREE") {
                             const signalIndexAfterSignup = postSignupSignals.findIndex(s => s.id === signal.id);
-                            if (signalIndexAfterSignup === -1 || signalIndexAfterSignup >= 5) {
-                                isLocked = true;
-                            }
+                            if (signalIndexAfterSignup === -1 || signalIndexAfterSignup >= 5) isLocked = true;
                         }
 
                         const isBuy = signal.type === "BUY";
@@ -481,10 +517,10 @@
 
                                     ${currentRole === "ADMIN" ? `
                                         <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-purple-900/20 justify-end">
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP1 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs">TP1 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP2 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs">TP2 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP3 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs">TP3 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'SL HIT')" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white px-2.5 py-1 rounded text-xs">SL Hit</button>
+                                            <button onclick="updateSignalStatus(${signal.id}, 'TP1 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP1 Hit</button>
+                                            <button onclick="updateSignalStatus(${signal.id}, 'TP2 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP2 Hit</button>
+                                            <button onclick="updateSignalStatus(${signal.id}, 'TP3 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP3 Hit</button>
+                                            <button onclick="updateSignalStatus(${signal.id}, 'SL HIT')" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">SL Hit</button>
                                             <button onclick="deleteSignal(${signal.id})" class="bg-gray-700 hover:bg-gray-600 text-white px-2.5 py-1 rounded text-xs">Delete</button>
                                         </div>
                                     ` : ''}
@@ -500,7 +536,7 @@
                 renderPendingPayments();
             }
 
-            // Publish Signal
+            // 7. Publish Signal Form
             signalForm.addEventListener("submit", (e) => {
                 e.preventDefault();
                 const signals = getSignals();
@@ -523,10 +559,9 @@
                 localStorage.setItem("trading_signals_data", JSON.stringify(signals));
                 signalForm.reset();
                 renderFeed();
-                alert("Signal Published Successfully!");
+                alert("New Signal Published Successfully!");
             });
 
-            // Status Updates
             window.updateSignalStatus = (id, statusResult) => {
                 let signals = getSignals();
                 const signal = signals.find(s => s.id === id);
@@ -539,7 +574,7 @@
             };
 
             window.deleteSignal = (id) => {
-                if (confirm("Delete this signal?")) {
+                if (confirm("Delete this signal permanently?")) {
                     let signals = getSignals();
                     signals = signals.filter(s => s.id !== id);
                     localStorage.setItem("trading_signals_data", JSON.stringify(signals));
@@ -547,7 +582,7 @@
                 }
             };
 
-            // Render Closed Analytics
+            // 8. Render Analytics Logs
             function renderClosedLogs() {
                 const signals = getSignals().filter(s => s.status === "CLOSED");
                 const goldClosedList = document.getElementById("gold-closed-list");
@@ -564,9 +599,7 @@
 
                     const row = `
                         <div class="flex items-center justify-between p-2.5 bg-[#1c1335] rounded-lg border border-purple-900/20">
-                            <div>
-                                <span class="font-bold text-white">${s.pair}</span> (${s.type}) | Entry: ${s.entry}
-                            </div>
+                            <div><span class="font-bold text-white">${s.pair}</span> (${s.type}) | Entry: ${s.entry}</div>
                             <div>${resBadge}</div>
                         </div>
                     `;
@@ -586,7 +619,7 @@
                 document.getElementById("gold-winrate-stat").innerText = `${winrate}%`;
             }
 
-            // Position Size Calculator
+            // 9. Lot Calculator
             window.calculateLotSize = () => {
                 const balance = parseFloat(document.getElementById("calc-balance").value) || 1000;
                 const riskPercent = parseFloat(document.getElementById("calc-risk").value) || 2;
@@ -600,21 +633,79 @@
                 document.getElementById("calc-result").classList.remove("hidden");
             };
 
-            // Payment Submissions
+            // 10. Profile Avatar Upload & Saved Info
+            const avatarInput = document.getElementById("avatar-input");
+            avatarInput.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const base64Img = event.target.result;
+                        localStorage.setItem("user_profile_avatar", base64Img);
+                        loadProfileAvatar();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            function loadProfileAvatar() {
+                const savedAvatar = localStorage.getItem("user_profile_avatar");
+                if (savedAvatar) {
+                    document.getElementById("profile-avatar-img").src = savedAvatar;
+                    document.getElementById("profile-avatar-img").classList.remove("hidden");
+                    document.getElementById("profile-avatar-placeholder").classList.add("hidden");
+                }
+            }
+            loadProfileAvatar();
+
+            window.saveProfileInfo = () => {
+                alert("Profile changes saved successfully!");
+            };
+
+            // 11. Plan Selection & Payment Submission
+            window.selectPlan = (planName) => {
+                currentSelectedPlan = planName;
+                document.getElementById("selected-plan-text").innerText = planName;
+                document.getElementById("payment-box").scrollIntoView({ behavior: 'smooth' });
+            };
+
+            const payScreenshotInput = document.getElementById("pay-screenshot");
+            let uploadedScreenshotBase64 = "";
+
+            payScreenshotInput.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        uploadedScreenshotBase64 = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
             document.getElementById("payment-submit-form").addEventListener("submit", (e) => {
                 e.preventDefault();
                 const sender = document.getElementById("pay-sender").value;
                 const tid = document.getElementById("pay-tid").value;
 
                 const pendingPayments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
-                pendingPayments.push({ id: Date.now(), sender, tid, date: new Date().toLocaleDateString() });
+                pendingPayments.push({
+                    id: Date.now(),
+                    sender,
+                    tid,
+                    plan: currentSelectedPlan,
+                    screenshot: uploadedScreenshotBase64,
+                    date: new Date().toLocaleDateString()
+                });
                 localStorage.setItem("pending_payments", JSON.stringify(pendingPayments));
 
-                alert("Payment Verification Request Submitted! Status: In Review.");
+                alert("Payment Proof Submitted! Status: In Review by Admin.");
                 e.target.reset();
+                uploadedScreenshotBase64 = "";
                 renderPendingPayments();
             });
 
+            // 12. Admin Pending Payments Review
             function renderPendingPayments() {
                 const list = document.getElementById("pending-payments-list");
                 const payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
@@ -627,14 +718,21 @@
 
                 payments.forEach(p => {
                     list.innerHTML += `
-                        <div class="flex items-center justify-between p-3 bg-[#1c1335] rounded-lg border border-purple-900/30 text-xs">
-                            <div>
-                                <p class="font-bold text-white">Sender: ${p.sender}</p>
-                                <p class="text-gray-400">TID: ${p.tid} | Date: ${p.date}</p>
+                        <div class="bg-[#1c1335] p-4 rounded-xl border border-purple-900/30 text-xs space-y-3">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                                <div>
+                                    <p class="font-bold text-white text-sm">Sender: ${p.sender}</p>
+                                    <p class="text-purple-300">Plan: <strong>${p.plan}</strong> | TID: <strong>${p.tid}</strong></p>
+                                    <p class="text-gray-400 text-[10px]">Submitted: ${p.date}</p>
+                                </div>
+                                <button onclick="approvePayment(${p.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold">Approve Upgrade</button>
                             </div>
-                            <div class="flex gap-2">
-                                <button onclick="approvePayment(${p.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded font-bold">Approve</button>
-                            </div>
+                            ${p.screenshot ? `
+                                <div class="pt-2 border-t border-purple-900/20">
+                                    <p class="text-gray-400 text-[10px] mb-1">Payment Proof Screenshot:</p>
+                                    <img src="${p.screenshot}" class="max-h-48 rounded border border-purple-500/30 object-contain">
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 });
@@ -645,7 +743,17 @@
                 payments = payments.filter(p => p.id !== id);
                 localStorage.setItem("pending_payments", JSON.stringify(payments));
                 alert("Payment Approved! User upgraded to VIP.");
+                roleSelector.value = "VIP";
                 renderFeed();
+            };
+
+            // 13. Logout Handler
+            window.handleLogout = () => {
+                if (confirm("Are you sure you want to log out?")) {
+                    roleSelector.value = "FREE";
+                    renderFeed();
+                    alert("Logged out successfully.");
+                }
             };
 
             roleSelector.addEventListener("change", renderFeed);
