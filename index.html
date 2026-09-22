@@ -9,10 +9,8 @@
 </head>
 <body class="bg-[#0b0813] text-white min-h-screen">
 
-    <!-- Top Header Navigation -->
     <header class="flex items-center justify-between p-4 bg-[#120b22] border-b border-purple-900/30">
         <div class="flex items-center gap-3">
-            <button id="toggle-sidebar" class="bg-slate-800 p-2 rounded text-white hover:bg-slate-700">☰</button>
             <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
                 🐼 TRADING <span class="text-purple-400">PANDA</span>
             </h1>
@@ -24,14 +22,12 @@
             <div>BTC/USD <span class="text-emerald-400">$68,450.00 ▲ +2.10%</span></div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div>
             <span class="bg-purple-600 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider">Admin VIP</span>
         </div>
     </header>
 
     <div class="max-w-5xl mx-auto p-6 space-y-8">
-        
-        <!-- Live Signal Feed Section -->
         <section>
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-bold flex items-center gap-2">
@@ -42,13 +38,9 @@
                 </span>
             </div>
 
-            <!-- Dynamic Signals Render Container -->
-            <div id="signals-feed-list" class="space-y-4">
-                <!-- Javascript will generate signals with Delete and Update buttons here -->
-            </div>
+            <div id="signals-feed-list" class="space-y-4"></div>
         </section>
 
-        <!-- Publish Signal Form -->
         <section class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-lg">
             <h3 class="text-md font-bold text-purple-300 mb-4">➕ Publish New Signal</h3>
             <form id="signal-form" class="space-y-4">
@@ -86,7 +78,6 @@
                 </button>
             </form>
         </section>
-
     </div>
 
     <script src="script.js"></script>
