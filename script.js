@@ -273,7 +273,7 @@ if (signalForm) {
   });
 }
 
-// Realtime Signal Feed Listener with 5 Free Trial Logic
+// Realtime Signal Feed Listener (Keep 5 Free Unlocked, Lock 6th & Upcoming)
 function listenToSignals() {
   const signalsRef = ref(db, "signals");
   onValue(signalsRef, (snapshot) => {
@@ -290,15 +290,25 @@ function listenToSignals() {
     const isAdmin = currentUser && currentUser.email.toLowerCase() === "admin@tradingpanda.com";
     const isVIP = isUserVIP || isAdmin;
 
-    // Convert object to array and sort by time (newest first)
-    const signalList = Object.entries(data)
-      .map(([id, val]) => ({ id, ...val }))
-      .sort((a, b) => b.timestamp - a.timestamp);
+    // Separate signals into: Post-signup signals (Oldest to Newest) and Pre-signup signals
+    const allSignals = Object.entries(data)
+      .map(([id, val]) => ({ id, ...val }));
 
-    // Filter signals published AFTER user registered
-    let userNewSignalsCount = 0;
+    // Filter signals published AFTER user registered (Chronological Order: Oldest -> Newest)
+    const postSignupSignals = allSignals
+      .filter(sig => userSignupTime > 0 && sig.timestamp >= userSignupTime)
+      .sort((a, b) => a.timestamp - b.timestamp);
 
-    signalList.forEach((sig) => {
+    // Map each post-signup signal ID with its sequential index (1-based)
+    const postSignupIndexMap = new Map();
+    postSignupSignals.forEach((sig, index) => {
+      postSignupIndexMap.set(sig.id, index + 1); // 1st, 2nd, 3rd, 4th, 5th, 6th...
+    });
+
+    // Final Display List (Newest First on Screen)
+    const sortedDisplayList = allSignals.sort((a, b) => b.timestamp - a.timestamp);
+
+    sortedDisplayList.forEach((sig) => {
       const cardWrapper = document.createElement("div");
       cardWrapper.style.position = "relative";
       cardWrapper.style.marginBottom = "15px";
@@ -307,15 +317,16 @@ function listenToSignals() {
       let isLocked = false;
 
       if (!isVIP) {
-        // If signal came after user signed up
-        if (userSignupTime > 0 && sig.timestamp >= userSignupTime) {
-          userNewSignalsCount++;
-          // Unlock first 5 signals, lock 6th onwards
-          if (userNewSignalsCount > 5) {
+        const signalNumber = postSignupIndexMap.get(sig.id);
+
+        if (signalNumber !== undefined) {
+          // If signal is 1st, 2nd, 3rd, 4th, or 5th after signup -> UNLOCKED
+          // If signal is 6th or higher (upcoming) -> LOCKED
+          if (signalNumber > 5) {
             isLocked = true;
           }
         } else {
-          // All older historical signals published before signup are locked for free user
+          // Historical signals published BEFORE user signed up -> LOCKED
           isLocked = true;
         }
       }
