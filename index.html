@@ -3,74 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading VIP Dashboard</title>
+    <title>Trading Panda - Admin Signal Feed</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex">
+<body class="bg-[#0b0813] text-white min-h-screen">
 
-    <!-- Sidebar Navigation -->
-    <aside class="w-64 bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between z-20">
-        <div>
-            <div class="flex items-center justify-between mb-8">
-                <h1 class="text-xl font-bold text-purple-400">Menu Options</h1>
-                <button id="close-menu" class="text-gray-400 hover:text-white">✕</button>
-            </div>
-            <nav class="space-y-4">
-                <a href="#" class="block py-2.5 px-4 rounded bg-purple-800/40 text-purple-300 font-medium">Dashboard / Overview</a>
-                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">TradingView Live Chart</a>
-                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Gold Accuracy & Win Rate</a>
-                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Forex Pairs Analytics</a>
-                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Gold & Forex Lot Calculator</a>
-                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Profile Settings</a>
-            </nav>
+    <!-- Top Header Navigation -->
+    <header class="flex items-center justify-between p-4 bg-[#120b22] border-b border-purple-900/30">
+        <div class="flex items-center gap-3">
+            <button id="toggle-sidebar" class="bg-slate-800 p-2 rounded text-white hover:bg-slate-700">☰</button>
+            <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
+                🐼 TRADING <span class="text-purple-400">PANDA</span>
+            </h1>
         </div>
-        <div>
-            <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
-                👑 Upgrade Your Plan (VIP)
-            </button>
+
+        <div class="hidden md:flex items-center gap-6 text-xs font-semibold">
+            <div>XAU/USD <span class="text-emerald-400">$2,738.50 ▲ +0.45%</span></div>
+            <div>EUR/USD <span class="text-rose-500">$1.0820 ▼ -0.12%</span></div>
+            <div>BTC/USD <span class="text-emerald-400">$68,450.00 ▲ +2.10%</span></div>
         </div>
-    </aside>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 p-6 overflow-y-auto">
-        <!-- Top Price Ticker -->
-        <header class="flex items-center justify-between mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
-            <div class="flex items-center gap-6 text-sm font-semibold">
-                <div>XAU/USD <span class="text-green-400">$2,738.50 ▲ +0.45%</span></div>
-                <div>EUR/USD <span class="text-red-400">$1.0820 ▼ -0.12%</span></div>
-                <div>BTC/USD <span class="text-green-400">$68,450.00 ▲ +2.10%</span></div>
-            </div>
-            <div class="bg-purple-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">
-                Admin VIP
-            </div>
-        </header>
+        <div class="flex items-center gap-2">
+            <span class="bg-purple-600 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider">Admin VIP</span>
+        </div>
+    </header>
 
-        <!-- Admin Control & Signal Section -->
-        <section class="max-w-4xl mx-auto space-y-6">
-            <h2 class="text-2xl font-bold border-b border-slate-800 pb-2">Signal Control Panel (Admin)</h2>
-
-            <!-- Current Signal Status Display -->
-            <div id="active-signal-container" class="bg-slate-900 p-5 rounded-xl border border-slate-800">
-                <!-- Javascript will dynamically inject Active Signal or No Signal state -->
+    <div class="max-w-5xl mx-auto p-6 space-y-8">
+        
+        <!-- Live Signal Feed Section -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                    <span class="text-purple-400">📡</span> Live Signal Feed
+                </h2>
+                <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full font-semibold border border-emerald-500/30">
+                    ● LIVE
+                </span>
             </div>
 
-            <!-- Publish Signal Form -->
-            <form id="signal-form" class="bg-slate-900 p-6 rounded-xl border border-slate-800 space-y-4">
-                <h3 class="text-lg font-semibold text-purple-400">Publish New Signal</h3>
-                
+            <!-- Dynamic Signals Render Container -->
+            <div id="signals-feed-list" class="space-y-4">
+                <!-- Javascript will generate signals with Delete and Update buttons here -->
+            </div>
+        </section>
+
+        <!-- Publish Signal Form -->
+        <section class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-lg">
+            <h3 class="text-md font-bold text-purple-300 mb-4">➕ Publish New Signal</h3>
+            <form id="signal-form" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Select Pair</label>
-                        <select id="signal-pair" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500">
-                            <option value="XAU/USD">XAU/USD (Gold)</option>
-                            <option value="EUR/USD">EUR/USD</option>
-                            <option value="BTC/USD">BTC/USD</option>
-                        </select>
+                        <label class="block text-xs text-gray-400 mb-1">Symbol</label>
+                        <input type="text" id="signal-pair" value="XAUUSD" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Trade Type</label>
-                        <select id="signal-type" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500">
+                        <label class="block text-xs text-gray-400 mb-1">Type</label>
+                        <select id="signal-type" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500">
                             <option value="BUY">BUY</option>
                             <option value="SELL">SELL</option>
                         </select>
@@ -80,24 +69,25 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Entry Price</label>
-                        <input type="text" id="signal-entry" placeholder="2738.50" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Take Profit (TP)</label>
-                        <input type="text" id="signal-tp" placeholder="2750.00" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                        <input type="number" step="any" id="signal-entry" placeholder="4000" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Stop Loss (SL)</label>
-                        <input type="text" id="signal-sl" placeholder="2725.00" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                        <input type="number" step="any" id="signal-sl" placeholder="3950" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Take Profit (TP)</label>
+                        <input type="number" step="any" id="signal-tp" placeholder="4050" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2">
-                    ✈️ Publish Signal
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold text-sm transition">
+                    🚀 Publish Signal
                 </button>
             </form>
         </section>
-    </main>
+
+    </div>
 
     <script src="script.js"></script>
 </body>
