@@ -428,3 +428,84 @@ button.secondary {
   font-size: 1.2rem;
   cursor: pointer;
 }
+/* Sidebar Drawer Styling */
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.2rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100%;
+  background: rgba(13, 11, 26, 0.98);
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10000;
+  transition: left 0.3s ease;
+  padding: 20px;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  padding: 12px 15px;
+  border-radius: 8px;
+  color: #aaa;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-item:hover, .menu-item.active {
+  background: rgba(138, 43, 226, 0.2);
+  color: #fff;
+}
+
+.highlight-vip {
+  background: linear-gradient(135deg, #8a2be2, #4a00e0);
+  color: #fff !important;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
