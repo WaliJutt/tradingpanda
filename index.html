@@ -3,44 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trading Panda - Premium Trading Signals</title>
+  <title>Trading Panda - Premium Signals & Analytics</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-  <!-- Top Bar & Live Ticker -->
+  <!-- Top Navbar with Sidebar Toggle -->
   <header class="top-nav">
-    <div class="logo">
-      <span class="logo-icon">🐼</span>
-      <h2>TRADING <span>PANDA</span></h2>
+    <div class="nav-left">
+      <button id="sidebar-toggle" class="menu-btn"><i class="fa-solid fa-bars"></i></button>
+      <div class="logo">
+        <span class="logo-icon">🐼</span>
+        <h2>TRADING <span>PANDA</span></h2>
+      </div>
     </div>
+    
     <div class="ticker-container">
       <div class="ticker-item"><span class="pair">XAU/USD</span> <span class="price green">$2,738.50 ▲ +0.45%</span></div>
       <div class="ticker-item"><span class="pair">EUR/USD</span> <span class="price red">$1.0820 ▼ -0.12%</span></div>
       <div class="ticker-item"><span class="pair">BTC/USD</span> <span class="price green">$68,450.00 ▲ +2.10%</span></div>
     </div>
+
     <div class="user-status">
       <span id="user-badge" class="badge free">Free Plan</span>
       <button id="logout-btn" class="hidden"><i class="fa-solid fa-right-from-bracket"></i></button>
     </div>
   </header>
 
-  <!-- Navigation Tabs -->
-  <nav class="main-tabs">
-    <button class="tab-btn active" data-tab="signals"><i class="fa-solid fa-bolt"></i> Signals</button>
-    <button class="tab-btn" data-tab="analytics"><i class="fa-solid fa-chart-line"></i> Analytics</button>
-    <button class="tab-btn" data-tab="premium"><i class="fa-solid fa-crown"></i> VIP Upgrade</button>
-    <button class="tab-btn" data-tab="profile"><i class="fa-solid fa-user"></i> Profile</button>
-  </nav>
+  <!-- Sidebar Drawer Navigation Menu -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h3>Menu Options</h3>
+      <button id="sidebar-close" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="menu-item active" data-tab="dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard / Overview</li>
+      <li class="menu-item" data-tab="chart"><i class="fa-solid fa-chart-candlestick"></i> TradingView Live Chart</li>
+      <li class="menu-item" data-tab="gold-stats"><i class="fa-solid fa-coins"></i> Gold Accuracy & Win Rate</li>
+      <li class="menu-item" data-tab="forex-stats"><i class="fa-solid fa-globe"></i> Forex Pairs Analytics</li>
+      <li class="menu-item" data-tab="calculator"><i class="fa-solid fa-calculator"></i> Gold & Forex Lot Calculator</li>
+      <li class="menu-item" data-tab="settings"><i class="fa-solid fa-gear"></i> Profile Settings</li>
+      <li class="menu-item highlight-vip" data-tab="premium"><i class="fa-solid fa-crown"></i> Upgrade Your Plan (VIP)</li>
+    </ul>
+  </aside>
 
-  <main class="container">
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
 
     <!-- Auth View (Login / Signup) -->
     <section id="auth-section" class="tab-content card">
       <div class="auth-header">
         <h2>Welcome to Trading Panda</h2>
-        <p>Access high-precision Forex & Crypto signals</p>
+        <p>Access high-precision Forex & Gold signals</p>
       </div>
       <div class="auth-form">
         <input type="email" id="email" placeholder="Email Address">
@@ -52,10 +67,8 @@
       </div>
     </section>
 
-    <!-- Tab 1: Signals Section -->
-    <section id="signals-tab" class="tab-content active-tab">
-      
-      <!-- Admin Panel (Only visible to admin) -->
+    <!-- 1. Dashboard Tab -->
+    <section id="dashboard-tab" class="tab-content active-tab">
       <div id="admin-panel" class="card admin-box hidden">
         <h3><i class="fa-solid fa-plus-circle"></i> Post New Signal (Admin)</h3>
         <form id="signal-form">
@@ -74,7 +87,6 @@
         </form>
       </div>
 
-      <!-- Live Signals Feed -->
       <div class="feed-header">
         <h3><i class="fa-solid fa-tower-broadcast"></i> Live Signal Feed</h3>
         <span class="live-dot">● LIVE</span>
@@ -82,55 +94,117 @@
       <div id="signals-container" class="signals-grid"></div>
     </section>
 
-    <!-- Tab 2: Analytics Section -->
-    <section id="analytics-tab" class="tab-content hidden">
+    <!-- 2. Live TradingView Chart Tab -->
+    <section id="chart-tab" class="tab-content hidden">
+      <div class="card chart-container">
+        <h3><i class="fa-solid fa-chart-line"></i> XAU/USD & Market Live Chart</h3>
+        <div class="tradingview-widget-container" style="height: 500px; width: 100%;">
+          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FKarachi" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Gold Signals Accuracy Tab -->
+    <section id="gold-stats-tab" class="tab-content hidden">
       <div class="card">
-        <h3><i class="fa-solid fa-chart-pie"></i> Performance Statistics</h3>
+        <h3>🥇 Gold (XAU/USD) Signal Accuracy</h3>
         <div class="stats-grid">
           <div class="stat-card">
-            <h4>Win Rate</h4>
-            <p class="stat-num green">87.5%</p>
+            <h4>Gold Win Rate</h4>
+            <p class="stat-num green">92.4%</p>
           </div>
           <div class="stat-card">
-            <h4>Total Pips</h4>
-            <p class="stat-num purple">+4,250</p>
+            <h4>Gold Total Pips</h4>
+            <p class="stat-num purple">+5,820 Pips</p>
           </div>
           <div class="stat-card">
-            <h4>Signals Posted</h4>
-            <p class="stat-num">142</p>
+            <h4>Avg Risk:Reward</h4>
+            <p class="stat-num">1:3.2</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Tab 3: VIP Upgrade / Premium Section -->
+    <!-- 4. Forex Pairs Analytics Tab -->
+    <section id="forex-stats-tab" class="tab-content hidden">
+      <div class="card">
+        <h3>💱 Major Forex Pairs Performance</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h4>EUR/USD Accuracy</h4>
+            <p class="stat-num green">86.1%</p>
+          </div>
+          <div class="stat-card">
+            <h4>GBP/USD Accuracy</h4>
+            <p class="stat-num green">88.5%</p>
+          </div>
+          <div class="stat-card">
+            <h4>Total Forex Pips</h4>
+            <p class="stat-num purple">+2,410 Pips</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Lot Size Calculator Tab -->
+    <section id="calculator-tab" class="tab-content hidden">
+      <div class="card calc-card">
+        <h3>🧮 Gold & Forex Position Size Calculator</h3>
+        <div class="calc-form">
+          <label>Account Balance ($):</label>
+          <input type="number" id="calc-balance" value="1000">
+          
+          <label>Risk Percentage (%):</label>
+          <input type="number" id="calc-risk" value="1">
+          
+          <label>Stop Loss (Pips):</label>
+          <input type="number" id="calc-sl-pips" value="30">
+          
+          <button id="calculate-btn" class="glow-btn">Calculate Lot Size</button>
+          
+          <div class="calc-result">
+            <h4>Recommended Lot Size: <span id="lot-result" class="green">0.03 Lot</span></h4>
+            <p>Risk Amount: $<span id="risk-amount">10.00</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Profile Settings Tab -->
+    <section id="settings-tab" class="tab-content hidden">
+      <div class="card">
+        <h3>⚙️ Profile Settings</h3>
+        <div class="profile-settings">
+          <div class="avatar-upload">
+            <img id="profile-img-preview" src="https://via.placeholder.com/100" alt="Profile Picture">
+            <input type="file" id="avatar-input" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label>Full Name / Display Name:</label>
+            <input type="text" id="profile-name-input" placeholder="Your Name">
+          </div>
+          <button id="save-profile-btn" class="glow-btn">Save Changes</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. VIP Upgrade & Local Payment Tab -->
     <section id="premium-tab" class="tab-content hidden">
       <div class="card vip-card">
         <i class="fa-solid fa-crown vip-icon"></i>
         <h2>Upgrade to Trading Panda VIP</h2>
-        <p>Get instant WhatsApp / App alerts, TP2/TP3 targets, and risk management calculators.</p>
+        <p>Get instant Live signals without limits + TP2/TP3 targets.</p>
         
-        <div class="pricing-grid">
-          <div class="plan-card">
-            <h3>Monthly VIP</h3>
-            <div class="price">$20 <span>/ month</span></div>
-            <ul>
-              <li><i class="fa-solid fa-check"></i> 100% Signal Accuracy</li>
-              <li><i class="fa-solid fa-check"></i> SL & Multiple TP Levels</li>
-              <li><i class="fa-solid fa-check"></i> VIP Telegram Group Access</li>
-            </ul>
-            <button class="glow-btn">Subscribe Now</button>
-          </div>
+        <div class="payment-methods card">
+          <h3>Local Payment Details</h3>
+          <p><strong>Easypaisa:</strong> 0300-XXXXXXX (Account Title)</p>
+          <p><strong>JazzCash:</strong> 0300-XXXXXXX (Account Title)</p>
+          <p><strong>USDT (TRC20):</strong> TXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
+          <hr>
+          <h4>Submit Payment Screenshot / Transaction ID</h4>
+          <input type="text" id="tid-input" placeholder="Enter Transaction ID (TID)">
+          <button id="submit-tid-btn" class="glow-btn">Submit Payment Proof</button>
         </div>
-      </div>
-    </section>
-
-    <!-- Tab 4: Profile Section -->
-    <section id="profile-tab" class="tab-content hidden">
-      <div class="card">
-        <h3><i class="fa-solid fa-id-card"></i> User Profile</h3>
-        <p><strong>Email:</strong> <span id="user-email-display">Not logged in</span></p>
-        <p><strong>Account Type:</strong> <span id="user-role-display">Guest</span></p>
       </div>
     </section>
 
