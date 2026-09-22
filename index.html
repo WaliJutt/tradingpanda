@@ -1,239 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trading Panda - Premium Signals & Analytics</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading VIP Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-950 text-white min-h-screen flex">
 
-  <!-- Top Navbar -->
-  <header class="top-nav">
-    <div class="nav-left">
-      <button id="sidebar-toggle" class="menu-btn"><i class="fa-solid fa-bars"></i></button>
-      <div class="logo">
-        <span class="logo-icon">🐼</span>
-        <h2>TRADING <span>PANDA</span></h2>
-      </div>
-    </div>
-    
-    <div class="ticker-container">
-      <div class="ticker-item"><span class="pair">XAU/USD</span> <span class="price green">$2,738.50 ▲ +0.45%</span></div>
-      <div class="ticker-item"><span class="pair">EUR/USD</span> <span class="price red">$1.0820 ▼ -0.12%</span></div>
-      <div class="ticker-item"><span class="pair">BTC/USD</span> <span class="price green">$68,450.00 ▲ +2.10%</span></div>
-    </div>
-
-    <div class="user-status">
-      <span id="user-badge" class="badge free">Free Plan</span>
-      <button id="logout-btn" class="hidden"><i class="fa-solid fa-right-from-bracket"></i></button>
-    </div>
-  </header>
-
-  <!-- Sidebar Drawer Navigation -->
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-      <h3>Menu Options</h3>
-      <button id="sidebar-close" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <ul class="sidebar-menu">
-      <li class="menu-item active" data-tab="dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard / Overview</li>
-      <li class="menu-item" data-tab="chart"><i class="fa-solid fa-chart-candlestick"></i> TradingView Live Chart</li>
-      <li class="menu-item" data-tab="gold-stats"><i class="fa-solid fa-coins"></i> Gold Accuracy & Win Rate</li>
-      <li class="menu-item" data-tab="forex-stats"><i class="fa-solid fa-globe"></i> Forex Pairs Analytics</li>
-      <li class="menu-item" data-tab="calculator"><i class="fa-solid fa-calculator"></i> Gold & Forex Lot Calculator</li>
-      
-      <!-- Pending Payment Requests option added right above Settings for Admin -->
-      <li class="menu-item hidden" id="admin-requests-menu-item" data-tab="requests"><i class="fa-solid fa-receipt"></i> Pending VIP Requests</li>
-      
-      <li class="menu-item" data-tab="settings"><i class="fa-solid fa-gear"></i> Profile Settings</li>
-      <li class="menu-item highlight-vip" data-tab="premium"><i class="fa-solid fa-crown"></i> Upgrade Your Plan (VIP)</li>
-    </ul>
-
-    <!-- Customer Support via Direct WhatsApp Link -->
-    <div class="sidebar-footer" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-      <a href="https://wa.me/923127554292?text=Hi%20Trading%20Panda%20Support,%20I%20need%20help%20with%20my%20account." target="_blank" class="support-btn" style="display:flex; align-items:center; gap:10px; color:#25D366; text-decoration:none; font-weight:bold;">
-        <i class="fa-brands fa-whatsapp" style="font-size:1.4rem;"></i> 24/7 VIP Support
-      </a>
-    </div>
-  </aside>
-
-  <!-- Main Content Wrapper -->
-  <main class="main-content">
-
-    <!-- Auth View -->
-    <section id="auth-section" class="tab-content card">
-      <div class="auth-header">
-        <h2>Welcome to Trading Panda</h2>
-        <p>Access high-precision Forex & Gold signals</p>
-      </div>
-      <div class="auth-form">
-        <input type="email" id="email" placeholder="Email Address">
-        <input type="password" id="password" placeholder="Password">
-        <div class="btn-group">
-          <button id="login-btn"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
-          <button id="signup-btn" class="secondary"><i class="fa-solid fa-user-plus"></i> Sign Up</button>
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between z-20">
+        <div>
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-xl font-bold text-purple-400">Menu Options</h1>
+                <button id="close-menu" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            <nav class="space-y-4">
+                <a href="#" class="block py-2.5 px-4 rounded bg-purple-800/40 text-purple-300 font-medium">Dashboard / Overview</a>
+                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">TradingView Live Chart</a>
+                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Gold Accuracy & Win Rate</a>
+                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Forex Pairs Analytics</a>
+                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Gold & Forex Lot Calculator</a>
+                <a href="#" class="block py-2.5 px-4 rounded hover:bg-slate-800 text-gray-400">Profile Settings</a>
+            </nav>
         </div>
-      </div>
-    </section>
-
-    <!-- 1. Dashboard Tab -->
-    <section id="dashboard-tab" class="tab-content active-tab">
-      <div id="admin-panel" class="card admin-box hidden">
-        <h3><i class="fa-solid fa-plus-circle"></i> Post New Signal (Admin)</h3>
-        <form id="signal-form">
-          <div class="form-grid">
-            <input type="text" id="pair" placeholder="Pair (e.g. XAU/USD)" required>
-            <select id="action">
-              <option value="BUY">BUY 🟢</option>
-              <option value="SELL">SELL 🔴</option>
-            </select>
-            <input type="text" id="entry" placeholder="Entry Price" required>
-            <input type="text" id="sl" placeholder="Stop Loss (SL)" required>
-            <input type="text" id="tp" placeholder="Take Profit 1 (TP1)" required>
-            <input type="text" id="tp2" placeholder="Take Profit 2 (TP2)">
-          </div>
-          <button type="submit" class="glow-btn"><i class="fa-solid fa-paper-plane"></i> Publish Signal</button>
-        </form>
-      </div>
-
-      <div class="feed-header">
-        <h3><i class="fa-solid fa-tower-broadcast"></i> Live Signal Feed</h3>
-        <span class="live-dot">● LIVE</span>
-      </div>
-      <div id="signals-container" class="signals-grid"></div>
-    </section>
-
-    <!-- 2. Live TradingView Chart Tab -->
-    <section id="chart-tab" class="tab-content hidden">
-      <div class="card chart-container">
-        <h3><i class="fa-solid fa-chart-line"></i> XAU/USD & Market Live Chart</h3>
-        <div class="tradingview-widget-container" style="height: 500px; width: 100%;">
-          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FKarachi" style="width: 100%; height: 100%; border: none;"></iframe>
+        <div>
+            <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                👑 Upgrade Your Plan (VIP)
+            </button>
         </div>
-      </div>
-    </section>
+    </aside>
 
-    <!-- 3. Gold Signals Accuracy Tab -->
-    <section id="gold-stats-tab" class="tab-content hidden">
-      <div class="card">
-        <h3>🥇 Gold (XAU/USD) Signal Accuracy</h3>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h4>Gold Win Rate</h4>
-            <p class="stat-num green">92.4%</p>
-          </div>
-          <div class="stat-card">
-            <h4>Gold Total Pips</h4>
-            <p class="stat-num purple">+5,820 Pips</p>
-          </div>
-          <div class="stat-card">
-            <h4>Avg Risk:Reward</h4>
-            <p class="stat-num">1:3.2</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 overflow-y-auto">
+        <!-- Top Price Ticker -->
+        <header class="flex items-center justify-between mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center gap-6 text-sm font-semibold">
+                <div>XAU/USD <span class="text-green-400">$2,738.50 ▲ +0.45%</span></div>
+                <div>EUR/USD <span class="text-red-400">$1.0820 ▼ -0.12%</span></div>
+                <div>BTC/USD <span class="text-green-400">$68,450.00 ▲ +2.10%</span></div>
+            </div>
+            <div class="bg-purple-600 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">
+                Admin VIP
+            </div>
+        </header>
 
-    <!-- 4. Forex Pairs Analytics Tab -->
-    <section id="forex-stats-tab" class="tab-content hidden">
-      <div class="card">
-        <h3>💱 Major Forex Pairs Performance</h3>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h4>EUR/USD Accuracy</h4>
-            <p class="stat-num green">86.1%</p>
-          </div>
-          <div class="stat-card">
-            <h4>GBP/USD Accuracy</h4>
-            <p class="stat-num green">88.5%</p>
-          </div>
-          <div class="stat-card">
-            <h4>Total Forex Pips</h4>
-            <p class="stat-num purple">+2,410 Pips</p>
-          </div>
-        </div>
-      </div>
-    </section>
+        <!-- Admin Control & Signal Section -->
+        <section class="max-w-4xl mx-auto space-y-6">
+            <h2 class="text-2xl font-bold border-b border-slate-800 pb-2">Signal Control Panel (Admin)</h2>
 
-    <!-- 5. Lot Size Calculator Tab -->
-    <section id="calculator-tab" class="tab-content hidden">
-      <div class="card calc-card">
-        <h3>🧮 Gold & Forex Position Size Calculator</h3>
-        <div class="calc-form">
-          <label>Account Balance ($):</label>
-          <input type="number" id="calc-balance" value="1000">
-          
-          <label>Risk Percentage (%):</label>
-          <input type="number" id="calc-risk" value="1">
-          
-          <label>Stop Loss (Pips):</label>
-          <input type="number" id="calc-sl-pips" value="30">
-          
-          <button id="calculate-btn" class="glow-btn">Calculate Lot Size</button>
-          
-          <div class="calc-result" style="margin-top:15px; padding:15px; background:rgba(255,255,255,0.03); border-radius:10px;">
-            <h4>Recommended Lot Size: <span id="lot-result" class="green">0.03 Lot</span></h4>
-            <p>Risk Amount: $<span id="risk-amount">10.00</span></p>
-          </div>
-        </div>
-      </div>
-    </section>
+            <!-- Current Signal Status Display -->
+            <div id="active-signal-container" class="bg-slate-900 p-5 rounded-xl border border-slate-800">
+                <!-- Javascript will dynamically inject Active Signal or No Signal state -->
+            </div>
 
-    <!-- 6. Pending VIP Payment Requests Tab (Dedicated Page) -->
-    <section id="requests-tab" class="tab-content hidden">
-      <div class="card">
-        <h3><i class="fa-solid fa-receipt"></i> Pending VIP Payment Requests</h3>
-        <p style="color:var(--text-muted); margin-bottom:15px; font-size:0.9rem;">Review Transaction IDs submitted by users to approve VIP access.</p>
-        <div id="payment-requests-container" style="margin-top:15px;">
-          <p style="color:var(--text-muted); font-size:0.9rem;">No pending VIP payment requests right now.</p>
-        </div>
-      </div>
-    </section>
+            <!-- Publish Signal Form -->
+            <form id="signal-form" class="bg-slate-900 p-6 rounded-xl border border-slate-800 space-y-4">
+                <h3 class="text-lg font-semibold text-purple-400">Publish New Signal</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Select Pair</label>
+                        <select id="signal-pair" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500">
+                            <option value="XAU/USD">XAU/USD (Gold)</option>
+                            <option value="EUR/USD">EUR/USD</option>
+                            <option value="BTC/USD">BTC/USD</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Trade Type</label>
+                        <select id="signal-type" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500">
+                            <option value="BUY">BUY</option>
+                            <option value="SELL">SELL</option>
+                        </select>
+                    </div>
+                </div>
 
-    <!-- 7. Profile Settings Tab -->
-    <section id="settings-tab" class="tab-content hidden">
-      <div class="card">
-        <h3>⚙️ Profile Settings</h3>
-        <div class="profile-settings">
-          <div class="avatar-upload" style="margin-bottom:15px;">
-            <img id="profile-img-preview" src="https://via.placeholder.com/100" alt="Profile Picture" style="border-radius:50%; margin-bottom:10px;">
-            <input type="file" id="avatar-input" accept="image/*">
-          </div>
-          <div class="form-group">
-            <label>Full Name / Display Name:</label>
-            <input type="text" id="profile-name-input" placeholder="Your Name">
-          </div>
-          <button id="save-profile-btn" class="glow-btn">Save Changes</button>
-        </div>
-      </div>
-    </section>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Entry Price</label>
+                        <input type="text" id="signal-entry" placeholder="2738.50" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Take Profit (TP)</label>
+                        <input type="text" id="signal-tp" placeholder="2750.00" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Stop Loss (SL)</label>
+                        <input type="text" id="signal-sl" placeholder="2725.00" class="w-full bg-slate-800 border border-slate-700 rounded p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                    </div>
+                </div>
 
-    <!-- 8. VIP Upgrade & Local Payment Tab -->
-    <section id="premium-tab" class="tab-content hidden">
-      <div class="card vip-card">
-        <i class="fa-solid fa-crown vip-icon" style="font-size:2.5rem; color:#ffd700; margin-bottom:10px;"></i>
-        <h2>Upgrade to Trading Panda VIP</h2>
-        <p style="color:var(--text-muted); margin-bottom:20px;">Get instant Live signals without limits + TP2/TP3 targets.</p>
-        
-        <div class="payment-methods card">
-          <h3>Local Payment Details</h3>
-          <p style="margin-top:10px;"><strong>Easypaisa:</strong> <span style="color:#00e676;">03127554292</span> (Wali UL Husnain)</p>
-          <p><strong>JazzCash:</strong> <span style="color:#00e676;">03127554292</span> (Wali UL Husnain)</p>
-          <p><strong>USDT (TRC20):</strong> <span style="color:#8a2be2; font-size:0.85rem;">TXX1234567890ABCDEFGH</span></p>
-          <hr style="margin:15px 0; border-color:rgba(255,255,255,0.1);">
-          <h4>Submit Transaction ID (TID) Proof</h4>
-          <form id="tid-form" style="margin-top:10px;">
-            <input type="text" id="tid-input" placeholder="Enter Transaction ID / TID Number" required>
-            <button type="submit" id="submit-tid-btn" class="glow-btn"><i class="fa-solid fa-check-circle"></i> Submit Payment Proof</button>
-          </form>
-        </div>
-      </div>
-    </section>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold transition flex items-center justify-center gap-2">
+                    ✈️ Publish Signal
+                </button>
+            </form>
+        </section>
+    </main>
 
-  </main>
-
-  <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
