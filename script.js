@@ -1,103 +1,117 @@
-// LocalStorage based Signal Management with Delete & Update options
-
 document.addEventListener("DOMContentLoaded", () => {
     const signalForm = document.getElementById("signal-form");
-    const activeSignalContainer = document.getElementById("active-signal-container");
+    const signalsFeedList = document.getElementById("signals-feed-list");
 
-    // Render Active Signal on Dashboard
-    function renderActiveSignal() {
-        const storedSignal = JSON.parse(localStorage.getItem("active_trading_signal"));
+    // Default Initial Mock Data
+    const defaultSignals = [
+        { id: 1, pair: "XAUUSD", type: "BUY", entry: "4000", sl: "3950", tp: "4050", status: "ACTIVE" },
+        { id: 2, pair: "XAUUSD", type: "SELL", entry: "4100", sl: "4200", tp: "4000", status: "ACTIVE" },
+        { id: 3, pair: "XAUUSD", type: "BUY", entry: "4360", sl: "4250", tp: "4380", status: "ACTIVE" },
+        { id: 4, pair: "XAUUSD", type: "BUY", entry: "4400", sl: "4350", tp: "4450", status: "ACTIVE" }
+    ];
 
-        if (!storedSignal || storedSignal.status === "CLOSED") {
-            activeSignalContainer.innerHTML = `
-                <div class="text-center py-6 text-gray-400">
-                    <p class="text-sm">Abhi koi active signal nahi hai.</p>
-                    <p class="text-xs text-slate-500 mt-1">Naya signal publish karne par yahan live update show hoga.</p>
+    // Get signals from localStorage or set default
+    function getSignals() {
+        const stored = localStorage.getItem("trading_signals_data");
+        if (!stored) {
+            localStorage.setItem("trading_signals_data", JSON.stringify(defaultSignals));
+            return defaultSignals;
+        }
+        return JSON.parse(stored);
+    }
+
+    // Render signals to Live Feed
+    function renderSignals() {
+        const signals = getSignals();
+        signalsFeedList.innerHTML = "";
+
+        if (signals.length === 0) {
+            signalsFeedList.innerHTML = `
+                <div class="text-center py-8 bg-[#130d24] rounded-xl border border-purple-900/20 text-gray-400">
+                    Koi signal available nahi hai. Naya signal add karein!
                 </div>
             `;
             return;
         }
 
-        // Active Signal Card HTML
-        activeSignalContainer.innerHTML = `
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 text-xs font-bold rounded bg-green-500/20 text-green-400 border border-green-500/30">
-                            ACTIVE SIGNAL
+        signals.forEach((signal) => {
+            const card = document.createElement("div");
+            card.className = "bg-[#130d24] p-4 rounded-xl border border-purple-900/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4";
+
+            const isBuy = signal.type === "BUY";
+            const typeBadgeColor = isBuy ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" : "text-rose-400 border-rose-500/30 bg-rose-500/10";
+
+            card.innerHTML = `
+                <div class="flex-1 w-full">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold text-lg tracking-wide text-white">${signal.pair}</span>
+                        <span class="text-xs font-extrabold px-3 py-1 rounded border ${typeBadgeColor}">
+                            ${signal.type}
                         </span>
-                        <h4 class="text-lg font-bold text-white">${storedSignal.pair} (${storedSignal.type})</h4>
                     </div>
-                    <div class="flex gap-4 mt-2 text-sm text-gray-300">
-                        <span>Entry: <b class="text-white">${storedSignal.entry}</b></span>
-                        <span>TP: <b class="text-green-400">${storedSignal.tp}</b></span>
-                        <span>SL: <b class="text-red-400">${storedSignal.sl}</b></span>
+                    <div class="flex items-center justify-between text-sm text-gray-300 bg-[#1c1335] p-2.5 rounded-lg border border-purple-900/20">
+                        <span>ENTRY: <strong class="text-white">${signal.entry}</strong></span>
+                        <span>SL: <strong class="text-rose-400">${signal.sl}</strong></span>
+                        <span>TP: <strong class="text-emerald-400">${signal.tp}</strong></span>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <button id="close-signal-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1.5 rounded text-xs font-bold transition">
-                        🔒 Close Signal
+                <!-- Admin Action Controls -->
+                <div class="flex items-center gap-2 w-full md:w-auto justify-end pt-2 md:pt-0 border-t md:border-t-0 border-purple-900/20">
+                    <button onclick="closeSignalHandler(${signal.id})" class="bg-amber-600/20 hover:bg-amber-600 text-amber-400 hover:text-white border border-amber-500/40 px-3 py-1.5 rounded text-xs font-semibold transition">
+                        🔒 Close
                     </button>
-                    <button id="delete-signal-btn" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-bold transition">
-                        🗑️ Delete Signal
+                    <button onclick="deleteSignalHandler(${signal.id})" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/40 px-3 py-1.5 rounded text-xs font-semibold transition">
+                        🗑️ Delete
                     </button>
                 </div>
-            </div>
-        `;
+            `;
 
-        // Attach Delete & Close Event Handlers
-        document.getElementById("delete-signal-btn").addEventListener("click", deleteSignal);
-        document.getElementById("close-signal-btn").addEventListener("click", closeSignal);
+            signalsFeedList.appendChild(card);
+        });
     }
 
-    // Publish New Signal
+    // Add New Signal Handler
     signalForm.addEventListener("submit", (e) => {
         e.preventDefault();
-
-        const pair = document.getElementById("signal-pair").value;
-        const type = document.getElementById("signal-type").value;
-        const entry = document.getElementById("signal-entry").value;
-        const tp = document.getElementById("signal-tp").value;
-        const sl = document.getElementById("signal-sl").value;
+        const signals = getSignals();
 
         const newSignal = {
             id: Date.now(),
-            pair,
-            type,
-            entry,
-            tp,
-            sl,
-            status: "ACTIVE",
-            timestamp: new Date().toISOString()
+            pair: document.getElementById("signal-pair").value.toUpperCase(),
+            type: document.getElementById("signal-type").value,
+            entry: document.getElementById("signal-entry").value,
+            sl: document.getElementById("signal-sl").value,
+            tp: document.getElementById("signal-tp").value,
+            status: "ACTIVE"
         };
 
-        // Overwrites any previous active signal
-        localStorage.setItem("active_trading_signal", JSON.stringify(newSignal));
-        alert("Signal Kamiyabi Se Publish Ho Gaya!");
+        signals.unshift(newSignal);
+        localStorage.setItem("trading_signals_data", JSON.stringify(signals));
         
         signalForm.reset();
-        renderActiveSignal();
+        renderSignals();
     });
 
-    // Delete Active Signal
-    function deleteSignal() {
-        if (confirm("Kya aap is signal ko bilkul delete karna chahte hain?")) {
-            localStorage.removeItem("active_trading_signal");
-            renderActiveSignal();
+    // Delete Signal Function
+    window.deleteSignalHandler = (id) => {
+        if (confirm("Kya aap is signal ko delete karna chahte hain?")) {
+            let signals = getSignals();
+            signals = signals.filter(s => s.id !== id);
+            localStorage.setItem("trading_signals_data", JSON.stringify(signals));
+            renderSignals();
         }
-    }
+    };
 
-    // Manual Close Active Signal
-    function closeSignal() {
-        const storedSignal = JSON.parse(localStorage.getItem("active_trading_signal"));
-        if (storedSignal) {
-            storedSignal.status = "CLOSED";
-            localStorage.setItem("active_trading_signal", JSON.stringify(storedSignal));
-            renderActiveSignal();
-        }
-    }
+    // Close Signal Function
+    window.closeSignalHandler = (id) => {
+        let signals = getSignals();
+        signals = signals.filter(s => s.id !== id);
+        localStorage.setItem("trading_signals_data", JSON.stringify(signals));
+        renderSignals();
+        alert("Signal close kar diya gaya hai.");
+    };
 
-    // Initial Load
-    renderActiveSignal();
+    // Initial Render
+    renderSignals();
 });
