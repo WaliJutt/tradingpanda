@@ -265,3 +265,29 @@ button.secondary {
   font-weight: bold;
   cursor: pointer;
 }
+
+/* Sidebar Menu Fix */
+.top-nav {
+  z-index: 9999 !important;
+}
+
+.menu-btn {
+  position: relative !important;
+  z-index: 10000 !important;
+  cursor: pointer !important;
+}
+
+.sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: -320px !important;
+  width: 290px !important;
+  height: 100vh !important;
+  background: #120e26 !important;
+  z-index: 99999 !important;
+  transition: left 0.3s ease-in-out !important;
+}
+
+.sidebar.open {
+  left: 0 !important;
+}
