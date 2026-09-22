@@ -43,14 +43,18 @@
       <li class="menu-item" data-tab="gold-stats"><i class="fa-solid fa-coins"></i> Gold Accuracy & Win Rate</li>
       <li class="menu-item" data-tab="forex-stats"><i class="fa-solid fa-globe"></i> Forex Pairs Analytics</li>
       <li class="menu-item" data-tab="calculator"><i class="fa-solid fa-calculator"></i> Gold & Forex Lot Calculator</li>
+      
+      <!-- Pending Payment Requests option added right above Settings for Admin -->
+      <li class="menu-item hidden" id="admin-requests-menu-item" data-tab="requests"><i class="fa-solid fa-receipt"></i> Pending VIP Requests</li>
+      
       <li class="menu-item" data-tab="settings"><i class="fa-solid fa-gear"></i> Profile Settings</li>
       <li class="menu-item highlight-vip" data-tab="premium"><i class="fa-solid fa-crown"></i> Upgrade Your Plan (VIP)</li>
     </ul>
 
-    <!-- Quick Help Option -->
+    <!-- Customer Support via Direct WhatsApp Link -->
     <div class="sidebar-footer" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-      <a href="https://wa.me/923000000000" target="_blank" class="support-btn" style="display:flex; align-items:center; gap:10px; color:#25D366; text-decoration:none; font-weight:bold;">
-        <i class="fa-brands fa-whatsapp" style="font-size:1.3rem;"></i> 24/7 VIP Support
+      <a href="https://wa.me/923127554292?text=Hi%20Trading%20Panda%20Support,%20I%20need%20help%20with%20my%20account." target="_blank" class="support-btn" style="display:flex; align-items:center; gap:10px; color:#25D366; text-decoration:none; font-weight:bold;">
+        <i class="fa-brands fa-whatsapp" style="font-size:1.4rem;"></i> 24/7 VIP Support
       </a>
     </div>
   </aside>
@@ -92,14 +96,6 @@
           </div>
           <button type="submit" class="glow-btn"><i class="fa-solid fa-paper-plane"></i> Publish Signal</button>
         </form>
-
-        <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.1);">
-        
-        <!-- Admin TID Review Requests -->
-        <h3><i class="fa-solid fa-receipt"></i> Pending VIP Payment Requests</h3>
-        <div id="payment-requests-container" style="margin-top:15px;">
-          <p style="color:var(--text-muted); font-size:0.9rem;">No pending VIP payment requests right now.</p>
-        </div>
       </div>
 
       <div class="feed-header">
@@ -185,7 +181,18 @@
       </div>
     </section>
 
-    <!-- 6. Profile Settings Tab -->
+    <!-- 6. Pending VIP Payment Requests Tab (Dedicated Page) -->
+    <section id="requests-tab" class="tab-content hidden">
+      <div class="card">
+        <h3><i class="fa-solid fa-receipt"></i> Pending VIP Payment Requests</h3>
+        <p style="color:var(--text-muted); margin-bottom:15px; font-size:0.9rem;">Review Transaction IDs submitted by users to approve VIP access.</p>
+        <div id="payment-requests-container" style="margin-top:15px;">
+          <p style="color:var(--text-muted); font-size:0.9rem;">No pending VIP payment requests right now.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Profile Settings Tab -->
     <section id="settings-tab" class="tab-content hidden">
       <div class="card">
         <h3>⚙️ Profile Settings</h3>
@@ -203,7 +210,7 @@
       </div>
     </section>
 
-    <!-- 7. VIP Upgrade & Local Payment Tab -->
+    <!-- 8. VIP Upgrade & Local Payment Tab -->
     <section id="premium-tab" class="tab-content hidden">
       <div class="card vip-card">
         <i class="fa-solid fa-crown vip-icon" style="font-size:2.5rem; color:#ffd700; margin-bottom:10px;"></i>
@@ -212,8 +219,8 @@
         
         <div class="payment-methods card">
           <h3>Local Payment Details</h3>
-          <p style="margin-top:10px;"><strong>Easypaisa:</strong> <span style="color:#00e676;">0300-1234567</span> (Passu Trading)</p>
-          <p><strong>JazzCash:</strong> <span style="color:#00e676;">0300-1234567</span> (Passu Trading)</p>
+          <p style="margin-top:10px;"><strong>Easypaisa:</strong> <span style="color:#00e676;">03127554292</span> (Wali UL Husnain)</p>
+          <p><strong>JazzCash:</strong> <span style="color:#00e676;">03127554292</span> (Wali UL Husnain)</p>
           <p><strong>USDT (TRC20):</strong> <span style="color:#8a2be2; font-size:0.85rem;">TXX1234567890ABCDEFGH</span></p>
           <hr style="margin:15px 0; border-color:rgba(255,255,255,0.1);">
           <h4>Submit Transaction ID (TID) Proof</h4>
