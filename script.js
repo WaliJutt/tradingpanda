@@ -29,38 +29,25 @@ const passwordInput = document.getElementById("password");
 const signalForm = document.getElementById("signal-form");
 const userBadge = document.getElementById("user-badge");
 
-// Sidebar Drawer Navigation Logic
-const sidebar = document.getElementById("sidebar");
-const sidebarToggle = document.getElementById("sidebar-toggle");
-const sidebarClose = document.getElementById("sidebar-close");
-const menuItems = document.querySelectorAll(".menu-item");
-
-if (sidebarToggle) {
-  sidebarToggle.addEventListener("click", (e) => {
-    e.stopPropagation();
-    sidebar.classList.add("open");
-  });
-}
-
-if (sidebarClose) {
-  sidebarClose.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-  });
-}
-
-// Close sidebar when clicking outside
+// Direct Universal Sidebar Logic (Click Fix)
 document.addEventListener("click", (e) => {
-  if (sidebar && sidebar.classList.contains("open") && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
-    sidebar.classList.remove("open");
+  const sidebar = document.getElementById("sidebar");
+  const toggleBtn = e.target.closest("#sidebar-toggle");
+  const closeBtn = e.target.closest("#sidebar-close");
+  const menuItem = e.target.closest(".menu-item");
+
+  if (toggleBtn) {
+    sidebar?.classList.add("open");
+  } else if (closeBtn || (sidebar && sidebar.classList.contains("open") && !sidebar.contains(e.target) && !toggleBtn)) {
+    sidebar?.classList.remove("open");
   }
-});
 
-menuItems.forEach(item => {
-  item.addEventListener("click", () => {
-    const targetTab = item.getAttribute("data-tab");
+  // Navigation Tab Switching
+  if (menuItem) {
+    const targetTab = menuItem.getAttribute("data-tab");
 
-    menuItems.forEach(i => i.classList.remove("active"));
-    item.classList.add("active");
+    document.querySelectorAll(".menu-item").forEach(i => i.classList.remove("active"));
+    menuItem.classList.add("active");
 
     document.querySelectorAll(".tab-content").forEach(content => {
       content.classList.add("hidden");
@@ -69,11 +56,11 @@ menuItems.forEach(item => {
     const selectedTab = document.getElementById(`${targetTab}-tab`);
     if (selectedTab) selectedTab.classList.remove("hidden");
 
-    sidebar.classList.remove("open");
-  });
+    sidebar?.classList.remove("open");
+  }
 });
 
-// Position Size Calculator
+// Position / Lot Size Calculator
 const calcBtn = document.getElementById("calculate-btn");
 if (calcBtn) {
   calcBtn.addEventListener("click", () => {
@@ -84,12 +71,14 @@ if (calcBtn) {
     const riskAmount = (balance * riskPercent) / 100;
     const lotSize = (riskAmount / (slPips * 10)).toFixed(2);
 
-    document.getElementById("risk-amount").innerText = riskAmount.toFixed(2);
-    document.getElementById("lot-result").innerText = `${lotSize} Lot`;
+    const riskDisplay = document.getElementById("risk-amount");
+    const lotDisplay = document.getElementById("lot-result");
+    if (riskDisplay) riskDisplay.innerText = riskAmount.toFixed(2);
+    if (lotDisplay) lotDisplay.innerText = `${lotSize} Lot`;
   });
 }
 
-// Auth Logic
+// Auth Handlers
 if (signupBtn) {
   signupBtn.addEventListener("click", async () => {
     const email = emailInput.value.trim();
@@ -123,7 +112,7 @@ if (logoutBtn) {
   });
 }
 
-// Auth Observer
+// Auth State Observer
 onAuthStateChanged(auth, (user) => {
   if (user) {
     if (authSection) authSection.classList.add("hidden");
@@ -153,7 +142,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Post Signal
+// Admin Post Signal
 if (signalForm) {
   signalForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -182,7 +171,7 @@ if (signalForm) {
   });
 }
 
-// Signal Feed Listener (Latest Signals Locked, Old 5 Free)
+// Realtime Signals (Latest Locked, Old 5 Free)
 const signalsRef = ref(db, "signals");
 onValue(signalsRef, (snapshot) => {
   if (!signalsContainer) return;
@@ -207,7 +196,6 @@ onValue(signalsRef, (snapshot) => {
 
     const card = document.createElement("div");
     
-    // Naye Signals Lock, purane 5 free
     const isNewSignal = index < (totalSignals - 5);
     const isLocked = !isAdminOrVIP && isNewSignal;
     
