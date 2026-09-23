@@ -6,10 +6,45 @@
     <title>Trading Panda - VIP Trading Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0813; }
+        ::-webkit-scrollbar-thumb { background: #4c1d95; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6d28d9; }
+        
+        /* Sidebar mobile overlay */
+        #sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 15;
+        }
+        #sidebar-overlay.active { display: block; }
+        
+        /* Smooth transitions */
+        .tab-content { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Signal card hover */
+        .signal-card { transition: all 0.2s ease; }
+        .signal-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15); }
+        
+        /* Pulse animation for live dot */
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .live-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+    </style>
 </head>
 <body class="bg-[#0b0813] text-white min-h-screen flex flex-col font-sans">
 
-    <!-- AUTHENTICATION MODAL POPUP -->
+    <!-- ==================== AUTH MODAL ==================== -->
     <div id="auth-modal" class="fixed inset-0 bg-[#0b0813]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-[#130d24] border border-purple-900/40 p-6 md:p-8 rounded-2xl max-w-md w-full shadow-2xl space-y-6">
             <div class="text-center space-y-2">
@@ -19,7 +54,7 @@
                 <p class="text-xs text-gray-400">VIP Signals & Gold Market Analytics Portal</p>
             </div>
 
-            <!-- Tabs: Signup / Login -->
+            <!-- Tabs -->
             <div class="flex border-b border-purple-900/30 text-sm font-semibold">
                 <button id="auth-tab-login" onclick="switchAuthMode('login')" class="flex-1 py-2 text-center text-purple-400 border-b-2 border-purple-500">Login</button>
                 <button id="auth-tab-signup" onclick="switchAuthMode('signup')" class="flex-1 py-2 text-center text-gray-400">Sign Up</button>
@@ -39,7 +74,8 @@
                 </div>
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">Password</label>
-                    <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                    <input type="password" id="auth-password" placeholder="••••••••" minlength="6" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                    <p id="password-error" class="text-xs text-rose-400 mt-1 hidden">Password must be at least 6 characters</p>
                 </div>
 
                 <button type="submit" id="auth-submit-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 py-3 rounded-xl font-bold text-sm shadow-lg transition">
@@ -49,13 +85,16 @@
         </div>
     </div>
 
-    <!-- Top Navigation Header -->
-    <header class="flex items-center justify-between px-6 py-3.5 bg-[#120b22] border-b border-purple-900/30 w-full z-30 sticky top-0">
-        <div class="flex items-center gap-4">
-            <button id="toggle-sidebar-btn" class="md:hidden text-gray-300 hover:text-white text-xl p-1 focus:outline-none">
+    <!-- ==================== SIDEBAR OVERLAY (MOBILE) ==================== -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="flex items-center justify-between px-4 md:px-6 py-3.5 bg-[#120b22] border-b border-purple-900/30 w-full z-30 sticky top-0">
+        <div class="flex items-center gap-3 md:gap-4">
+            <button id="toggle-sidebar-btn" onclick="toggleSidebar()" class="md:hidden text-gray-300 hover:text-white text-xl p-1 focus:outline-none">
                 ☰
             </button>
-            <h1 class="text-xl font-extrabold tracking-wide flex items-center gap-2">
+            <h1 class="text-lg md:text-xl font-extrabold tracking-wide flex items-center gap-2">
                 🐼 TRADING <span class="text-purple-400">PANDA</span>
             </h1>
         </div>
@@ -67,8 +106,8 @@
             <div>BTC/USD <span id="ticker-btc" class="text-emerald-400 ml-1 font-bold">Loading...</span></div>
         </div>
 
-        <!-- Role Selector & Logout Controls -->
-        <div class="flex items-center gap-3">
+        <!-- User Controls -->
+        <div class="flex items-center gap-2 md:gap-3">
             <div id="admin-switcher-box" class="hidden items-center gap-2 bg-[#1c1335] px-3 py-1.5 rounded-lg border border-purple-900/40">
                 <label class="text-[11px] text-gray-400 font-medium">View As:</label>
                 <select id="role-selector" class="bg-transparent text-purple-300 text-xs font-bold focus:outline-none cursor-pointer">
@@ -77,17 +116,17 @@
                     <option value="ADMIN">Admin Panel</option>
                 </select>
             </div>
-            <button onclick="handleLogout()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
-                🚪 Logout
+            <button onclick="handleLogout()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/40 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                🚪 <span class="hidden sm:inline">Logout</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Workspace Layout -->
+    <!-- ==================== MAIN LAYOUT ==================== -->
     <div class="flex flex-1 overflow-hidden relative">
 
-        <!-- Sidebar Drawer Navigation -->
-        <aside id="sidebar-drawer" class="w-64 bg-[#120b22] border-r border-purple-900/30 flex flex-col justify-between p-4 z-20 shrink-0">
+        <!-- Sidebar -->
+        <aside id="sidebar-drawer" class="w-64 bg-[#120b22] border-r border-purple-900/30 flex flex-col justify-between p-4 z-20 shrink-0 fixed md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
             <div class="space-y-6">
                 <div class="text-xs font-bold text-gray-400 uppercase tracking-wider px-3">
                     Menu Options
@@ -121,13 +160,12 @@
             </div>
         </aside>
 
-        <!-- Main Body Content -->
+        <!-- Main Content -->
         <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
 
-            <!-- TAB 1: DASHBOARD & LIVE SIGNALS -->
+            <!-- ========== TAB 1: DASHBOARD ========== -->
             <div id="tab-dashboard" class="tab-content space-y-6">
-                
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between flex-wrap gap-3">
                     <h2 class="text-lg font-bold flex items-center gap-2">
                         <span class="text-purple-400">📡</span> Live Signal Feed
                     </h2>
@@ -136,15 +174,14 @@
                             Free Plan
                         </span>
                         <span class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-semibold border border-emerald-500/30 flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> LIVE
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span> LIVE
                         </span>
                     </div>
                 </div>
 
-                <!-- Signals Container -->
                 <div id="signals-feed-list" class="space-y-4 max-w-4xl"></div>
 
-                <!-- Admin Publish Signal Form -->
+                <!-- Admin: Publish Signal -->
                 <div id="admin-publish-section" class="hidden bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
                     <h3 class="text-md font-bold text-purple-300 flex items-center gap-2">
                         ➕ Admin: Publish New Signal
@@ -167,665 +204,4 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs text-gray-400 mb-1">Entry Price</label>
-                                <input type="number" step="any" id="signal-entry" placeholder="2738.50" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-400 mb-1">Stop Loss (SL)</label>
-                                <input type="number" step="any" id="signal-sl" placeholder="2725.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-xs text-gray-400 mb-1">Take Profit 1 (TP1)</label>
-                                <input type="number" step="any" id="signal-tp1" placeholder="2745.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-400 mb-1">Take Profit 2 (TP2)</label>
-                                <input type="number" step="any" id="signal-tp2" placeholder="2755.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-400 mb-1">Take Profit 3 (TP3)</label>
-                                <input type="number" step="any" id="signal-tp3" placeholder="2770.00" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500">
-                            </div>
-                        </div>
-
-                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold text-sm transition shadow-lg flex items-center justify-center gap-2">
-                            🚀 Publish Signal
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Admin Pending Payments Review Section -->
-                <div id="admin-payments-section" class="hidden bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
-                    <h3 class="text-md font-bold text-amber-400 flex items-center gap-2">
-                        💳 Admin: Pending Payment Verifications
-                    </h3>
-                    <div id="pending-payments-list" class="space-y-4"></div>
-                </div>
-
-            </div>
-
-            <!-- TAB 2: TRADINGVIEW LIVE CHART -->
-            <div id="tab-chart" class="tab-content hidden space-y-4 max-w-5xl">
-                <h2 class="text-lg font-bold text-purple-300">TradingView Live Gold Chart</h2>
-                <div class="bg-[#130d24] p-2 rounded-xl border border-purple-900/30 h-[550px] w-full" id="tradingview_chart_container"></div>
-            </div>
-
-            <!-- TAB 3: GOLD ACCURACY -->
-            <div id="tab-accuracy" class="tab-content hidden space-y-4 max-w-5xl">
-                <h2 class="text-lg font-bold text-purple-300">Gold Performance & Closed Trades</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 text-center">
-                        <p class="text-xs text-gray-400">Gold Win Rate</p>
-                        <p id="gold-winrate-stat" class="text-2xl font-bold text-emerald-400 mt-1">100%</p>
-                    </div>
-                    <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 text-center">
-                        <p class="text-xs text-gray-400">Total Gold Trades</p>
-                        <p id="gold-trades-count" class="text-2xl font-bold text-purple-400 mt-1">0</p>
-                    </div>
-                    <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 text-center">
-                        <p class="text-xs text-gray-400">Wins / Losses</p>
-                        <p id="gold-wins-loss-stat" class="text-2xl font-bold text-blue-400 mt-1">0 / 0</p>
-                    </div>
-                </div>
-                <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 space-y-3">
-                    <h3 class="text-sm font-bold text-gray-300">Closed Gold Signals Log</h3>
-                    <div id="gold-closed-list" class="space-y-2 text-sm"></div>
-                </div>
-            </div>
-
-            <!-- TAB 4: FOREX ANALYTICS -->
-            <div id="tab-analytics" class="tab-content hidden space-y-4 max-w-5xl">
-                <h2 class="text-lg font-bold text-purple-300">Forex Pairs Closed Analytics</h2>
-                <div id="forex-closed-list" class="space-y-2 text-sm bg-[#130d24] p-5 rounded-xl border border-purple-900/30"></div>
-            </div>
-
-            <!-- TAB 5: LOT CALCULATOR -->
-            <div id="tab-calculator" class="tab-content hidden space-y-4 max-w-md">
-                <h2 class="text-lg font-bold text-purple-300">Position Size & Risk Calculator</h2>
-                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Select Pair / Asset</label>
-                        <select id="calc-asset" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
-                            <option value="XAUUSD">XAU/USD (Gold)</option>
-                            <option value="EURUSD">EUR/USD</option>
-                            <option value="GBPUSD">GBP/USD</option>
-                            <option value="BTCUSD">BTC/USD</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Account Balance ($)</label>
-                        <input type="number" id="calc-balance" value="1000" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Risk per Trade (%)</label>
-                        <input type="number" id="calc-risk" value="2" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Stop Loss (Pips)</label>
-                        <input type="number" id="calc-sl-pips" value="30" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
-                    </div>
-                    <button onclick="calculateLotSize()" class="w-full bg-purple-600 hover:bg-purple-700 py-2.5 rounded-lg font-bold text-sm">Calculate Lot Size</button>
-                    
-                    <div id="calc-result" class="hidden p-3 bg-[#1c1335] rounded-lg border border-purple-500/30 text-center space-y-1">
-                        <p class="text-xs text-gray-400">Recommended Lot Size:</p>
-                        <p id="calc-lot-val" class="text-xl font-bold text-emerald-400">0.07 Lots</p>
-                        <p id="calc-risk-val" class="text-xs text-gray-400">Risk Amount: $20.00</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 6: PROFILE SETTINGS & 3 TIERS UPGRADE -->
-            <div id="tab-settings" class="tab-content hidden space-y-6 max-w-4xl">
-                <h2 class="text-lg font-bold text-purple-300">Profile Settings & Membership Plans</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 space-y-3 flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs bg-gray-500/20 text-gray-300 px-2 py-1 rounded font-bold">FREE PLAN</span>
-                            <h3 class="text-xl font-bold mt-2">PKR 0</h3>
-                            <p class="text-xs text-gray-400 mt-1">First 5 signals unlocked after registration.</p>
-                        </div>
-                        <button class="w-full bg-gray-700 text-gray-300 text-xs font-bold py-2 rounded cursor-not-allowed">Default Active</button>
-                    </div>
-
-                    <div class="bg-[#130d24] p-5 rounded-xl border border-purple-500/50 space-y-3 flex flex-col justify-between relative overflow-hidden">
-                        <div class="absolute top-2 right-2 text-[10px] bg-purple-600 text-white font-bold px-2 py-0.5 rounded">POPULAR</div>
-                        <div>
-                            <span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded font-bold">PRO MONTHLY</span>
-                            <h3 class="text-xl font-bold mt-2">PKR 3,000 <span class="text-xs text-gray-400 font-normal">/ month</span></h3>
-                            <p class="text-xs text-gray-400 mt-1">Unlimited live signals, TP1-3 updates, lot calculator & charts.</p>
-                        </div>
-                        <button onclick="selectPlan('PRO MONTHLY (PKR 3,000)')" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 rounded">Select Plan</button>
-                    </div>
-
-                    <div class="bg-[#130d24] p-5 rounded-xl border border-amber-500/50 space-y-3 flex flex-col justify-between relative overflow-hidden">
-                        <div class="absolute top-2 right-2 text-[10px] bg-amber-500 text-black font-bold px-2 py-0.5 rounded">BEST VALUE</div>
-                        <div>
-                            <span class="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded font-bold">PRO YEARLY</span>
-                            <h3 class="text-xl font-bold mt-2">PKR 25,000 <span class="text-xs text-gray-400 font-normal">/ year</span></h3>
-                            <p class="text-xs text-gray-400 mt-1">Discounted full year unlimited VIP signals & priority support.</p>
-                        </div>
-                        <button onclick="selectPlan('PRO YEARLY (PKR 25,000)')" class="w-full bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold py-2 rounded">Select Plan</button>
-                    </div>
-                </div>
-
-                <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
-                    <h3 class="text-md font-semibold text-gray-200">Personal Information</h3>
-                    <div class="flex items-center gap-4">
-                        <img id="profile-avatar-img" src="" class="w-16 h-16 rounded-full border border-purple-500/40 object-cover hidden">
-                        <div id="profile-avatar-placeholder" class="w-16 h-16 rounded-full bg-purple-900/40 border border-purple-500/30 flex items-center justify-center text-xl font-bold text-purple-300">U</div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Upload Profile Picture</label>
-                            <input type="file" id="avatar-input" accept="image/*" class="text-xs text-gray-400">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Full Name</label>
-                        <input type="text" id="profile-name" value="Trading User" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Email Address</label>
-                        <input type="email" id="profile-email" value="user@gmail.com" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
-                    </div>
-                    <button onclick="saveProfileInfo()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-xs font-bold">Save Profile Changes</button>
-                </div>
-
-                <div id="payment-box" class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
-                    <h3 class="text-md font-bold text-amber-400">💳 Send Payment & Submit Proof</h3>
-                    <p class="text-xs text-gray-300">Selected Plan: <strong id="selected-plan-text" class="text-purple-300">PRO MONTHLY (PKR 3,000)</strong></p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-[#1c1335] p-4 rounded-lg border border-purple-900/40">
-                        <div class="space-y-1">
-                            <span class="font-bold text-emerald-400">EasyPaisa Account:</span>
-                            <p>Number: <strong class="text-white">03127554292</strong></p>
-                            <p>Name: <strong class="text-white">Wali UL Hasnain</strong></p>
-                        </div>
-                        <div class="space-y-1">
-                            <span class="font-bold text-amber-400">JazzCash Account:</span>
-                            <p>Number: <strong class="text-white">03061756478</strong></p>
-                            <p>Name: <strong class="text-white">Wali UL Hasnain</strong></p>
-                        </div>
-                    </div>
-
-                    <form id="payment-submit-form" class="space-y-3">
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Sender Name & Number</label>
-                            <input type="text" id="pay-sender" placeholder="e.g. Ali - 0300xxxxxxx" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Transaction ID (TID)</label>
-                            <input type="text" id="pay-tid" placeholder="e.g. 9821371283" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-400 mb-1">Upload Payment Screenshot Proof</label>
-                            <input type="file" id="pay-screenshot" accept="image/*" class="text-xs text-gray-400" required>
-                        </div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-2.5 rounded-lg text-xs transition">
-                            Submit Payment Verification Proof
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- Script Engine -->
-    <script>
-        let isAuthModeLogin = true;
-
-        window.switchAuthMode = (mode) => {
-            isAuthModeLogin = (mode === 'login');
-            const signupFields = document.getElementById('signup-fields');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            const tabLogin = document.getElementById('auth-tab-login');
-            const tabSignup = document.getElementById('auth-tab-signup');
-
-            if (isAuthModeLogin) {
-                signupFields.classList.add('hidden');
-                submitBtn.innerText = 'Login to Portal';
-                tabLogin.className = 'flex-1 py-2 text-center text-purple-400 border-b-2 border-purple-500';
-                tabSignup.className = 'flex-1 py-2 text-center text-gray-400';
-            } else {
-                signupFields.classList.remove('hidden');
-                submitBtn.innerText = 'Create Free Account';
-                tabSignup.className = 'flex-1 py-2 text-center text-purple-400 border-b-2 border-purple-500';
-                tabLogin.className = 'flex-1 py-2 text-center text-gray-400';
-            }
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const roleSelector = document.getElementById("role-selector");
-            const signalsFeedList = document.getElementById("signals-feed-list");
-            const adminSection = document.getElementById("admin-publish-section");
-            const userStatusBadge = document.getElementById("user-status-badge");
-            const signalForm = document.getElementById("signal-form");
-            const toggleSidebarBtn = document.getElementById("toggle-sidebar-btn");
-            const sidebarDrawer = document.getElementById("sidebar-drawer");
-            const authModal = document.getElementById("auth-modal");
-            const authForm = document.getElementById("auth-form");
-
-            let currentSelectedPlan = "PRO MONTHLY (PKR 3,000)";
-
-            // Check Active User Session
-            const activeUser = localStorage.getItem("active_portal_user");
-            if (!activeUser) {
-                authModal.classList.remove("hidden");
-            } else {
-                authModal.classList.add("hidden");
-                const userData = JSON.parse(activeUser);
-                document.getElementById("profile-name").value = userData.name || "Trading User";
-                document.getElementById("profile-email").value = userData.email || "user@gmail.com";
-                
-                // Secret Admin Unlock Check
-                if (userData.email === "walijuttwalijutt22@gmail.com") {
-                    document.getElementById("admin-switcher-box").classList.remove("hidden");
-                    roleSelector.value = "ADMIN";
-                }
-            }
-
-            // Auth Submission
-            authForm.addEventListener("submit", (e) => {
-                e.preventDefault();
-                const email = document.getElementById("auth-email").value;
-                const name = document.getElementById("auth-name").value || email.split("@")[0];
-
-                const userData = { email, name, role: "FREE", joinedAt: Date.now() };
-                localStorage.setItem("active_portal_user", JSON.stringify(userData));
-                localStorage.setItem("user_signup_time", Date.now().toString());
-
-                authModal.classList.add("hidden");
-
-                if (email === "walijuttwalijutt22@gmail.com") {
-                    document.getElementById("admin-switcher-box").classList.remove("hidden");
-                    roleSelector.value = "ADMIN";
-                } else {
-                    document.getElementById("admin-switcher-box").classList.add("hidden");
-                    roleSelector.value = "FREE";
-                }
-
-                renderFeed();
-            });
-
-            // Live Crypto & Forex Ticker Fetch
-            async function fetchLiveTicker() {
-                try {
-                    const resBtc = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
-                    const dataBtc = await resBtc.json();
-                    document.getElementById("ticker-btc").innerText = `$${parseFloat(dataBtc.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-
-                    const resPaxg = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT");
-                    const dataPaxg = await resPaxg.json();
-                    document.getElementById("ticker-xau").innerText = `$${parseFloat(dataPaxg.price).toFixed(2)}`;
-
-                    const resEur = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=EURUSDT");
-                    const dataEur = await resEur.json();
-                    document.getElementById("ticker-eur").innerText = `$${parseFloat(dataEur.price).toFixed(4)}`;
-                } catch(e) {}
-            }
-            fetchLiveTicker();
-            setInterval(fetchLiveTicker, 5000);
-
-            toggleSidebarBtn.addEventListener("click", () => sidebarDrawer.classList.toggle("hidden"));
-
-            window.switchTab = (tabName) => {
-                document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
-                document.getElementById(`tab-${tabName}`).classList.remove("hidden");
-
-                if(tabName === 'chart') loadTradingViewChart();
-
-                const navButtons = ["dashboard", "chart", "accuracy", "analytics", "calculator", "settings"];
-                navButtons.forEach(btn => {
-                    const el = document.getElementById(`nav-${btn}`);
-                    if(el) {
-                        el.className = (btn === tabName) ? 
-                            "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 font-semibold text-left" : 
-                            "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-purple-900/20 text-left transition";
-                    }
-                });
-            };
-
-            function loadTradingViewChart() {
-                const container = document.getElementById('tradingview_chart_container');
-                container.innerHTML = '';
-                new TradingView.widget({
-                    "autosize": true,
-                    "symbol": "OANDA:XAUUSD",
-                    "interval": "60",
-                    "timezone": "Etc/UTC",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "en",
-                    "toolbar_bg": "#130d24",
-                    "enable_publishing": false,
-                    "allow_symbol_change": true,
-                    "container_id": "tradingview_chart_container"
-                });
-            }
-
-            const userSignupTime = parseInt(localStorage.getItem("user_signup_time") || Date.now().toString(), 10);
-
-            function getSignals() {
-                const stored = localStorage.getItem("trading_signals_data");
-                if (!stored) {
-                    const now = Date.now();
-                    const initialSignals = [
-                        { id: now, pair: "XAUUSD", type: "BUY", entry: "2738.50", sl: "2725.00", tp1: "2745.00", tp2: "2755.00", tp3: "2770.00", status: "ACTIVE", result: "", timestamp: now }
-                    ];
-                    localStorage.setItem("trading_signals_data", JSON.stringify(initialSignals));
-                    return initialSignals;
-                }
-                return JSON.parse(stored);
-            }
-
-            function renderFeed() {
-                const currentRole = roleSelector.value;
-                const allSignals = getSignals();
-
-                allSignals.sort((a, b) => a.timestamp - b.timestamp);
-                const postSignupSignals = allSignals.filter(s => s.timestamp >= userSignupTime);
-
-                if (currentRole === "ADMIN") {
-                    adminSection.classList.remove("hidden");
-                    document.getElementById("admin-payments-section").classList.remove("hidden");
-                    userStatusBadge.innerText = "Admin Control Active";
-                    userStatusBadge.className = "text-xs bg-purple-600 text-white px-3 py-1 rounded-full font-semibold";
-                } else if (currentRole === "VIP") {
-                    adminSection.classList.add("hidden");
-                    document.getElementById("admin-payments-section").classList.add("hidden");
-                    userStatusBadge.innerText = "VIP Unlimited Plan";
-                    userStatusBadge.className = "text-xs bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full font-semibold border border-amber-500/30";
-                } else {
-                    adminSection.classList.add("hidden");
-                    document.getElementById("admin-payments-section").classList.add("hidden");
-                    userStatusBadge.innerText = "Free Access (First 5 Signals)";
-                    userStatusBadge.className = "text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full font-semibold border border-purple-500/30";
-                }
-
-                signalsFeedList.innerHTML = "";
-                const activeSignals = allSignals.filter(s => s.status === "ACTIVE").reverse();
-
-                if (activeSignals.length === 0) {
-                    signalsFeedList.innerHTML = `<div class="text-center py-8 text-gray-400 bg-[#130d24] rounded-xl border border-purple-900/20">No active live signals right now.</div>`;
-                } else {
-                    activeSignals.forEach((signal) => {
-                        const card = document.createElement("div");
-                        card.className = "relative bg-[#130d24] p-4 rounded-xl border border-purple-900/30 overflow-hidden shadow-md";
-
-                        let isLocked = false;
-                        if (currentRole === "FREE") {
-                            const signalIndexAfterSignup = postSignupSignals.findIndex(s => s.id === signal.id);
-                            if (signalIndexAfterSignup === -1 || signalIndexAfterSignup >= 5) isLocked = true;
-                        }
-
-                        const isBuy = signal.type === "BUY";
-                        const badgeClass = isBuy ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" : "text-rose-400 border-rose-500/30 bg-rose-500/10";
-
-                        if (isLocked) {
-                            card.innerHTML = `
-                                <div class="filter blur-md select-none opacity-30 flex items-center justify-between">
-                                    <div><span class="font-bold text-lg">${signal.pair}</span></div>
-                                    <span class="text-xs font-bold px-3 py-1 rounded border ${badgeClass}">${signal.type}</span>
-                                </div>
-                                <div class="absolute inset-0 bg-[#0b0813]/85 backdrop-blur-sm flex items-center justify-between p-4 z-10">
-                                    <div class="flex items-center gap-3">
-                                        <span class="text-2xl">🔒</span>
-                                        <div>
-                                            <h4 class="text-sm font-bold text-white">Signal Locked (VIP Only)</h4>
-                                            <p class="text-xs text-gray-400">First 5 free signals limit reached.</p>
-                                        </div>
-                                    </div>
-                                    <button onclick="switchTab('settings')" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-3 rounded-lg">Upgrade VIP</button>
-                                </div>
-                            `;
-                        } else {
-                            card.innerHTML = `
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-bold text-lg text-white">${signal.pair}</span>
-                                        <span class="text-xs font-extrabold px-3 py-1 rounded border ${badgeClass}">${signal.type}</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs text-gray-300 bg-[#1c1335] p-2.5 rounded-lg border border-purple-900/20">
-                                        <div>ENTRY: <strong class="text-white">${signal.entry}</strong></div>
-                                        <div>SL: <strong class="text-rose-400">${signal.sl}</strong></div>
-                                        <div>TP1: <strong class="text-emerald-400">${signal.tp1}</strong></div>
-                                        <div>TP2: <strong class="text-emerald-400">${signal.tp2 || '-'}</strong></div>
-                                        <div>TP3: <strong class="text-emerald-400">${signal.tp3 || '-'}</strong></div>
-                                    </div>
-
-                                    ${currentRole === "ADMIN" ? `
-                                        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-purple-900/20 justify-end">
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP1 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP1 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP2 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP2 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP3 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP3 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'SL HIT')" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">SL Hit</button>
-                                            <button onclick="deleteSignal(${signal.id})" class="bg-gray-700 hover:bg-gray-600 text-white px-2.5 py-1 rounded text-xs">Delete</button>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        }
-
-                        signalsFeedList.appendChild(card);
-                    });
-                }
-
-                renderClosedLogs();
-                renderPendingPayments();
-            }
-
-            signalForm.addEventListener("submit", (e) => {
-                e.preventDefault();
-                const signals = getSignals();
-
-                const newSignal = {
-                    id: Date.now(),
-                    pair: document.getElementById("signal-pair").value.toUpperCase(),
-                    type: document.getElementById("signal-type").value,
-                    entry: document.getElementById("signal-entry").value,
-                    sl: document.getElementById("signal-sl").value,
-                    tp1: document.getElementById("signal-tp1").value,
-                    tp2: document.getElementById("signal-tp2").value,
-                    tp3: document.getElementById("signal-tp3").value,
-                    status: "ACTIVE",
-                    result: "",
-                    timestamp: Date.now()
-                };
-
-                signals.push(newSignal);
-                localStorage.setItem("trading_signals_data", JSON.stringify(signals));
-                signalForm.reset();
-                renderFeed();
-                alert("New Signal Published!");
-            });
-
-            window.updateSignalStatus = (id, statusResult) => {
-                let signals = getSignals();
-                const signal = signals.find(s => s.id === id);
-                if (signal) {
-                    signal.status = "CLOSED";
-                    signal.result = statusResult;
-                    localStorage.setItem("trading_signals_data", JSON.stringify(signals));
-                    renderFeed();
-                }
-            };
-
-            window.deleteSignal = (id) => {
-                if (confirm("Delete signal?")) {
-                    let signals = getSignals();
-                    signals = signals.filter(s => s.id !== id);
-                    localStorage.setItem("trading_signals_data", JSON.stringify(signals));
-                    renderFeed();
-                }
-            };
-
-            function renderClosedLogs() {
-                const signals = getSignals().filter(s => s.status === "CLOSED");
-                const goldClosedList = document.getElementById("gold-closed-list");
-                const forexClosedList = document.getElementById("forex-closed-list");
-
-                goldClosedList.innerHTML = "";
-                forexClosedList.innerHTML = "";
-
-                let goldWins = 0, goldTotal = 0;
-
-                signals.forEach(s => {
-                    const isWin = s.result.includes("TP");
-                    const resBadge = isWin ? `<span class="text-emerald-400 font-bold">${s.result}</span>` : `<span class="text-rose-400 font-bold">${s.result}</span>`;
-
-                    const row = `
-                        <div class="flex items-center justify-between p-2.5 bg-[#1c1335] rounded-lg border border-purple-900/20">
-                            <div><span class="font-bold text-white">${s.pair}</span> (${s.type}) | Entry: ${s.entry}</div>
-                            <div>${resBadge}</div>
-                        </div>
-                    `;
-
-                    if (s.pair.includes("XAU") || s.pair.includes("GOLD")) {
-                        goldTotal++;
-                        if (isWin) goldWins++;
-                        goldClosedList.innerHTML += row;
-                    } else {
-                        forexClosedList.innerHTML += row;
-                    }
-                });
-
-                document.getElementById("gold-trades-count").innerText = goldTotal;
-                document.getElementById("gold-wins-loss-stat").innerText = `${goldWins} / ${goldTotal - goldWins}`;
-                const winrate = goldTotal > 0 ? Math.round((goldWins / goldTotal) * 100) : 100;
-                document.getElementById("gold-winrate-stat").innerText = `${winrate}%`;
-            }
-
-            window.calculateLotSize = () => {
-                const balance = parseFloat(document.getElementById("calc-balance").value) || 1000;
-                const riskPercent = parseFloat(document.getElementById("calc-risk").value) || 2;
-                const slPips = parseFloat(document.getElementById("calc-sl-pips").value) || 30;
-
-                const riskAmount = (balance * riskPercent) / 100;
-                const lotSize = (riskAmount / (slPips * 10)).toFixed(2);
-
-                document.getElementById("calc-lot-val").innerText = `${lotSize} Lots`;
-                document.getElementById("calc-risk-val").innerText = `Risk Amount: $${riskAmount.toFixed(2)}`;
-                document.getElementById("calc-result").classList.remove("hidden");
-            };
-
-            const avatarInput = document.getElementById("avatar-input");
-            avatarInput.addEventListener("change", (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        localStorage.setItem("user_profile_avatar", event.target.result);
-                        loadProfileAvatar();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            function loadProfileAvatar() {
-                const savedAvatar = localStorage.getItem("user_profile_avatar");
-                if (savedAvatar) {
-                    document.getElementById("profile-avatar-img").src = savedAvatar;
-                    document.getElementById("profile-avatar-img").classList.remove("hidden");
-                    document.getElementById("profile-avatar-placeholder").classList.add("hidden");
-                }
-            }
-            loadProfileAvatar();
-
-            window.saveProfileInfo = () => {
-                alert("Profile saved successfully!");
-            };
-
-            window.selectPlan = (planName) => {
-                currentSelectedPlan = planName;
-                document.getElementById("selected-plan-text").innerText = planName;
-                document.getElementById("payment-box").scrollIntoView({ behavior: 'smooth' });
-            };
-
-            const payScreenshotInput = document.getElementById("pay-screenshot");
-            let uploadedScreenshotBase64 = "";
-
-            payScreenshotInput.addEventListener("change", (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        uploadedScreenshotBase64 = event.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            document.getElementById("payment-submit-form").addEventListener("submit", (e) => {
-                e.preventDefault();
-                const sender = document.getElementById("pay-sender").value;
-                const tid = document.getElementById("pay-tid").value;
-
-                const pendingPayments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
-                pendingPayments.push({
-                    id: Date.now(),
-                    sender,
-                    tid,
-                    plan: currentSelectedPlan,
-                    screenshot: uploadedScreenshotBase64,
-                    date: new Date().toLocaleDateString()
-                });
-                localStorage.setItem("pending_payments", JSON.stringify(pendingPayments));
-
-                alert("Payment Proof Submitted! Status: In Review.");
-                e.target.reset();
-                uploadedScreenshotBase64 = "";
-                renderPendingPayments();
-            });
-
-            function renderPendingPayments() {
-                const list = document.getElementById("pending-payments-list");
-                const payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
-                list.innerHTML = "";
-
-                if (payments.length === 0) {
-                    list.innerHTML = `<p class="text-xs text-gray-400">No pending verification requests.</p>`;
-                    return;
-                }
-
-                payments.forEach(p => {
-                    list.innerHTML += `
-                        <div class="bg-[#1c1335] p-4 rounded-xl border border-purple-900/30 text-xs space-y-3">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                                <div>
-                                    <p class="font-bold text-white text-sm">Sender: ${p.sender}</p>
-                                    <p class="text-purple-300">Plan: <strong>${p.plan}</strong> | TID: <strong>${p.tid}</strong></p>
-                                </div>
-                                <button onclick="approvePayment(${p.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold">Approve Upgrade</button>
-                            </div>
-                            ${p.screenshot ? `
-                                <div class="pt-2 border-t border-purple-900/20">
-                                    <img src="${p.screenshot}" class="max-h-48 rounded border border-purple-500/30 object-contain">
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                });
-            }
-
-            window.approvePayment = (id) => {
-                let payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
-                payments = payments.filter(p => p.id !== id);
-                localStorage.setItem("pending_payments", JSON.stringify(payments));
-                alert("Payment Approved! User upgraded to VIP.");
-                roleSelector.value = "VIP";
-                renderFeed();
-            };
-
-            window.handleLogout = () => {
-                localStorage.removeItem("active_portal_user");
-                location.reload();
-            };
-
-            roleSelector.addEventListener("change", renderFeed);
-            renderFeed();
-        });
-    </script>
-</body>
-</html>
+                                <input type="number" step="any" id="signal-entry" placeholder="2738.50" class="w-full
