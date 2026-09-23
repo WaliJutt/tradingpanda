@@ -9,6 +9,46 @@
 </head>
 <body class="bg-[#0b0813] text-white min-h-screen flex flex-col font-sans">
 
+    <!-- AUTHENTICATION MODAL POPUP -->
+    <div id="auth-modal" class="fixed inset-0 bg-[#0b0813]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-[#130d24] border border-purple-900/40 p-6 md:p-8 rounded-2xl max-w-md w-full shadow-2xl space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-2xl font-extrabold flex items-center justify-center gap-2">
+                    🐼 TRADING <span class="text-purple-400">PANDA</span>
+                </h2>
+                <p class="text-xs text-gray-400">VIP Signals & Gold Market Analytics Portal</p>
+            </div>
+
+            <!-- Tabs: Signup / Login -->
+            <div class="flex border-b border-purple-900/30 text-sm font-semibold">
+                <button id="auth-tab-login" onclick="switchAuthMode('login')" class="flex-1 py-2 text-center text-purple-400 border-b-2 border-purple-500">Login</button>
+                <button id="auth-tab-signup" onclick="switchAuthMode('signup')" class="flex-1 py-2 text-center text-gray-400">Sign Up</button>
+            </div>
+
+            <!-- Form -->
+            <form id="auth-form" class="space-y-4">
+                <div id="signup-fields" class="hidden space-y-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Full Name</label>
+                        <input type="text" id="auth-name" placeholder="Wali UL Hasnain" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Email Address</label>
+                    <input type="email" id="auth-email" placeholder="user@gmail.com" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Password</label>
+                    <input type="password" id="auth-password" placeholder="••••••••" class="w-full bg-[#1c1335] border border-purple-900/40 rounded-lg p-2.5 text-sm focus:outline-none focus:border-purple-500" required>
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 py-3 rounded-xl font-bold text-sm shadow-lg transition">
+                    Login to Portal
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Top Navigation Header -->
     <header class="flex items-center justify-between px-6 py-3.5 bg-[#120b22] border-b border-purple-900/30 w-full z-30 sticky top-0">
         <div class="flex items-center gap-4">
@@ -20,7 +60,7 @@
             </h1>
         </div>
 
-        <!-- Real-time Live Price Ticker -->
+        <!-- Live Price Ticker -->
         <div class="hidden lg:flex items-center gap-6 text-xs font-semibold bg-[#1c1335]/70 px-4 py-2 rounded-lg border border-purple-900/30">
             <div>XAU/USD <span id="ticker-xau" class="text-emerald-400 ml-1 font-bold">Loading...</span></div>
             <div>EUR/USD <span id="ticker-eur" class="text-emerald-400 ml-1 font-bold">Loading...</span></div>
@@ -29,12 +69,12 @@
 
         <!-- Role Selector & Logout Controls -->
         <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 bg-[#1c1335] px-3 py-1.5 rounded-lg border border-purple-900/40">
+            <div id="admin-switcher-box" class="hidden items-center gap-2 bg-[#1c1335] px-3 py-1.5 rounded-lg border border-purple-900/40">
                 <label class="text-[11px] text-gray-400 font-medium">View As:</label>
                 <select id="role-selector" class="bg-transparent text-purple-300 text-xs font-bold focus:outline-none cursor-pointer">
-                    <option value="ADMIN">Admin Panel</option>
                     <option value="FREE">Free Member</option>
                     <option value="VIP">VIP Member</option>
+                    <option value="ADMIN">Admin Panel</option>
                 </select>
             </div>
             <button onclick="handleLogout()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/40 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
@@ -102,12 +142,10 @@
                 </div>
 
                 <!-- Signals Container -->
-                <div id="signals-feed-list" class="space-y-4 max-w-4xl">
-                    <!-- Dynamic Signals -->
-                </div>
+                <div id="signals-feed-list" class="space-y-4 max-w-4xl"></div>
 
                 <!-- Admin Publish Signal Form -->
-                <div id="admin-publish-section" class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
+                <div id="admin-publish-section" class="hidden bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
                     <h3 class="text-md font-bold text-purple-300 flex items-center gap-2">
                         ➕ Admin: Publish New Signal
                     </h3>
@@ -159,13 +197,11 @@
                 </div>
 
                 <!-- Admin Pending Payments Review Section -->
-                <div id="admin-payments-section" class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
+                <div id="admin-payments-section" class="hidden bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
                     <h3 class="text-md font-bold text-amber-400 flex items-center gap-2">
                         💳 Admin: Pending Payment Verifications
                     </h3>
-                    <div id="pending-payments-list" class="space-y-4">
-                        <!-- Pending Payments with Image Screenshots -->
-                    </div>
+                    <div id="pending-payments-list" class="space-y-4"></div>
                 </div>
 
             </div>
@@ -244,9 +280,7 @@
             <div id="tab-settings" class="tab-content hidden space-y-6 max-w-4xl">
                 <h2 class="text-lg font-bold text-purple-300">Profile Settings & Membership Plans</h2>
 
-                <!-- Membership Plans Tiers Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Plan 1: Free -->
                     <div class="bg-[#130d24] p-5 rounded-xl border border-purple-900/30 space-y-3 flex flex-col justify-between">
                         <div>
                             <span class="text-xs bg-gray-500/20 text-gray-300 px-2 py-1 rounded font-bold">FREE PLAN</span>
@@ -256,7 +290,6 @@
                         <button class="w-full bg-gray-700 text-gray-300 text-xs font-bold py-2 rounded cursor-not-allowed">Default Active</button>
                     </div>
 
-                    <!-- Plan 2: Pro Monthly -->
                     <div class="bg-[#130d24] p-5 rounded-xl border border-purple-500/50 space-y-3 flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute top-2 right-2 text-[10px] bg-purple-600 text-white font-bold px-2 py-0.5 rounded">POPULAR</div>
                         <div>
@@ -267,7 +300,6 @@
                         <button onclick="selectPlan('PRO MONTHLY (PKR 3,000)')" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 rounded">Select Plan</button>
                     </div>
 
-                    <!-- Plan 3: Pro Yearly -->
                     <div class="bg-[#130d24] p-5 rounded-xl border border-amber-500/50 space-y-3 flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute top-2 right-2 text-[10px] bg-amber-500 text-black font-bold px-2 py-0.5 rounded">BEST VALUE</div>
                         <div>
@@ -279,12 +311,11 @@
                     </div>
                 </div>
 
-                <!-- Profile Info Edit -->
                 <div class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
                     <h3 class="text-md font-semibold text-gray-200">Personal Information</h3>
                     <div class="flex items-center gap-4">
                         <img id="profile-avatar-img" src="" class="w-16 h-16 rounded-full border border-purple-500/40 object-cover hidden">
-                        <div id="profile-avatar-placeholder" class="w-16 h-16 rounded-full bg-purple-900/40 border border-purple-500/30 flex items-center justify-center text-xl font-bold text-purple-300">W</div>
+                        <div id="profile-avatar-placeholder" class="w-16 h-16 rounded-full bg-purple-900/40 border border-purple-500/30 flex items-center justify-center text-xl font-bold text-purple-300">U</div>
                         <div>
                             <label class="block text-xs text-gray-400 mb-1">Upload Profile Picture</label>
                             <input type="file" id="avatar-input" accept="image/*" class="text-xs text-gray-400">
@@ -292,20 +323,15 @@
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Full Name</label>
-                        <input type="text" id="profile-name" value="Wali UL Hasnain" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                        <input type="text" id="profile-name" value="Trading User" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Email Address</label>
-                        <input type="email" id="profile-email" value="walijuttwalijutt22@gmail.com" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1">Phone Number</label>
-                        <input type="text" id="profile-phone" value="03127554292" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
+                        <input type="email" id="profile-email" value="user@gmail.com" class="w-full bg-[#1c1335] border border-purple-900/40 rounded p-2 text-sm">
                     </div>
                     <button onclick="saveProfileInfo()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-xs font-bold">Save Profile Changes</button>
                 </div>
 
-                <!-- Payment Verification Form -->
                 <div id="payment-box" class="bg-[#130d24] p-6 rounded-xl border border-purple-900/30 space-y-4">
                     <h3 class="text-md font-bold text-amber-400">💳 Send Payment & Submit Proof</h3>
                     <p class="text-xs text-gray-300">Selected Plan: <strong id="selected-plan-text" class="text-purple-300">PRO MONTHLY (PKR 3,000)</strong></p>
@@ -348,6 +374,28 @@
 
     <!-- Script Engine -->
     <script>
+        let isAuthModeLogin = true;
+
+        window.switchAuthMode = (mode) => {
+            isAuthModeLogin = (mode === 'login');
+            const signupFields = document.getElementById('signup-fields');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const tabLogin = document.getElementById('auth-tab-login');
+            const tabSignup = document.getElementById('auth-tab-signup');
+
+            if (isAuthModeLogin) {
+                signupFields.classList.add('hidden');
+                submitBtn.innerText = 'Login to Portal';
+                tabLogin.className = 'flex-1 py-2 text-center text-purple-400 border-b-2 border-purple-500';
+                tabSignup.className = 'flex-1 py-2 text-center text-gray-400';
+            } else {
+                signupFields.classList.remove('hidden');
+                submitBtn.innerText = 'Create Free Account';
+                tabSignup.className = 'flex-1 py-2 text-center text-purple-400 border-b-2 border-purple-500';
+                tabLogin.className = 'flex-1 py-2 text-center text-gray-400';
+            }
+        };
+
         document.addEventListener("DOMContentLoaded", () => {
             const roleSelector = document.getElementById("role-selector");
             const signalsFeedList = document.getElementById("signals-feed-list");
@@ -356,10 +404,52 @@
             const signalForm = document.getElementById("signal-form");
             const toggleSidebarBtn = document.getElementById("toggle-sidebar-btn");
             const sidebarDrawer = document.getElementById("sidebar-drawer");
+            const authModal = document.getElementById("auth-modal");
+            const authForm = document.getElementById("auth-form");
 
             let currentSelectedPlan = "PRO MONTHLY (PKR 3,000)";
 
-            // 1. Live Crypto & Forex Ticker Fetch (Binance Public API)
+            // Check Active User Session
+            const activeUser = localStorage.getItem("active_portal_user");
+            if (!activeUser) {
+                authModal.classList.remove("hidden");
+            } else {
+                authModal.classList.add("hidden");
+                const userData = JSON.parse(activeUser);
+                document.getElementById("profile-name").value = userData.name || "Trading User";
+                document.getElementById("profile-email").value = userData.email || "user@gmail.com";
+                
+                // Secret Admin Unlock Check
+                if (userData.email === "walijuttwalijutt22@gmail.com") {
+                    document.getElementById("admin-switcher-box").classList.remove("hidden");
+                    roleSelector.value = "ADMIN";
+                }
+            }
+
+            // Auth Submission
+            authForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const email = document.getElementById("auth-email").value;
+                const name = document.getElementById("auth-name").value || email.split("@")[0];
+
+                const userData = { email, name, role: "FREE", joinedAt: Date.now() };
+                localStorage.setItem("active_portal_user", JSON.stringify(userData));
+                localStorage.setItem("user_signup_time", Date.now().toString());
+
+                authModal.classList.add("hidden");
+
+                if (email === "walijuttwalijutt22@gmail.com") {
+                    document.getElementById("admin-switcher-box").classList.remove("hidden");
+                    roleSelector.value = "ADMIN";
+                } else {
+                    document.getElementById("admin-switcher-box").classList.add("hidden");
+                    roleSelector.value = "FREE";
+                }
+
+                renderFeed();
+            });
+
+            // Live Crypto & Forex Ticker Fetch
             async function fetchLiveTicker() {
                 try {
                     const resBtc = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
@@ -373,17 +463,13 @@
                     const resEur = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=EURUSDT");
                     const dataEur = await resEur.json();
                     document.getElementById("ticker-eur").innerText = `$${parseFloat(dataEur.price).toFixed(4)}`;
-                } catch(e) {
-                    console.log("Ticker loading...");
-                }
+                } catch(e) {}
             }
             fetchLiveTicker();
             setInterval(fetchLiveTicker, 5000);
 
-            // 2. Sidebar Toggle
             toggleSidebarBtn.addEventListener("click", () => sidebarDrawer.classList.toggle("hidden"));
 
-            // 3. Tab Switching Logic
             window.switchTab = (tabName) => {
                 document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
                 document.getElementById(`tab-${tabName}`).classList.remove("hidden");
@@ -419,13 +505,8 @@
                 });
             }
 
-            // 4. Registration Timestamp
-            if (!localStorage.getItem("user_signup_time")) {
-                localStorage.setItem("user_signup_time", Date.now().toString());
-            }
-            const userSignupTime = parseInt(localStorage.getItem("user_signup_time"), 10);
+            const userSignupTime = parseInt(localStorage.getItem("user_signup_time") || Date.now().toString(), 10);
 
-            // 5. Signals Data
             function getSignals() {
                 const stored = localStorage.getItem("trading_signals_data");
                 if (!stored) {
@@ -439,7 +520,6 @@
                 return JSON.parse(stored);
             }
 
-            // 6. Feed Render
             function renderFeed() {
                 const currentRole = roleSelector.value;
                 const allSignals = getSignals();
@@ -536,7 +616,6 @@
                 renderPendingPayments();
             }
 
-            // 7. Publish Signal Form
             signalForm.addEventListener("submit", (e) => {
                 e.preventDefault();
                 const signals = getSignals();
@@ -559,7 +638,7 @@
                 localStorage.setItem("trading_signals_data", JSON.stringify(signals));
                 signalForm.reset();
                 renderFeed();
-                alert("New Signal Published Successfully!");
+                alert("New Signal Published!");
             });
 
             window.updateSignalStatus = (id, statusResult) => {
@@ -574,7 +653,7 @@
             };
 
             window.deleteSignal = (id) => {
-                if (confirm("Delete this signal permanently?")) {
+                if (confirm("Delete signal?")) {
                     let signals = getSignals();
                     signals = signals.filter(s => s.id !== id);
                     localStorage.setItem("trading_signals_data", JSON.stringify(signals));
@@ -582,7 +661,6 @@
                 }
             };
 
-            // 8. Render Analytics Logs
             function renderClosedLogs() {
                 const signals = getSignals().filter(s => s.status === "CLOSED");
                 const goldClosedList = document.getElementById("gold-closed-list");
@@ -595,7 +673,7 @@
 
                 signals.forEach(s => {
                     const isWin = s.result.includes("TP");
-                    const resBadge = isWin ? `<span class="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">${s.result}</span>` : `<span class="text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/30 font-bold">${s.result}</span>`;
+                    const resBadge = isWin ? `<span class="text-emerald-400 font-bold">${s.result}</span>` : `<span class="text-rose-400 font-bold">${s.result}</span>`;
 
                     const row = `
                         <div class="flex items-center justify-between p-2.5 bg-[#1c1335] rounded-lg border border-purple-900/20">
@@ -619,7 +697,6 @@
                 document.getElementById("gold-winrate-stat").innerText = `${winrate}%`;
             }
 
-            // 9. Lot Calculator
             window.calculateLotSize = () => {
                 const balance = parseFloat(document.getElementById("calc-balance").value) || 1000;
                 const riskPercent = parseFloat(document.getElementById("calc-risk").value) || 2;
@@ -633,15 +710,13 @@
                 document.getElementById("calc-result").classList.remove("hidden");
             };
 
-            // 10. Profile Avatar Upload & Saved Info
             const avatarInput = document.getElementById("avatar-input");
             avatarInput.addEventListener("change", (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = (event) => {
-                        const base64Img = event.target.result;
-                        localStorage.setItem("user_profile_avatar", base64Img);
+                        localStorage.setItem("user_profile_avatar", event.target.result);
                         loadProfileAvatar();
                     };
                     reader.readAsDataURL(file);
@@ -659,10 +734,9 @@
             loadProfileAvatar();
 
             window.saveProfileInfo = () => {
-                alert("Profile changes saved successfully!");
+                alert("Profile saved successfully!");
             };
 
-            // 11. Plan Selection & Payment Submission
             window.selectPlan = (planName) => {
                 currentSelectedPlan = planName;
                 document.getElementById("selected-plan-text").innerText = planName;
@@ -699,13 +773,12 @@
                 });
                 localStorage.setItem("pending_payments", JSON.stringify(pendingPayments));
 
-                alert("Payment Proof Submitted! Status: In Review by Admin.");
+                alert("Payment Proof Submitted! Status: In Review.");
                 e.target.reset();
                 uploadedScreenshotBase64 = "";
                 renderPendingPayments();
             });
 
-            // 12. Admin Pending Payments Review
             function renderPendingPayments() {
                 const list = document.getElementById("pending-payments-list");
                 const payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
@@ -723,13 +796,11 @@
                                 <div>
                                     <p class="font-bold text-white text-sm">Sender: ${p.sender}</p>
                                     <p class="text-purple-300">Plan: <strong>${p.plan}</strong> | TID: <strong>${p.tid}</strong></p>
-                                    <p class="text-gray-400 text-[10px]">Submitted: ${p.date}</p>
                                 </div>
                                 <button onclick="approvePayment(${p.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold">Approve Upgrade</button>
                             </div>
                             ${p.screenshot ? `
                                 <div class="pt-2 border-t border-purple-900/20">
-                                    <p class="text-gray-400 text-[10px] mb-1">Payment Proof Screenshot:</p>
                                     <img src="${p.screenshot}" class="max-h-48 rounded border border-purple-500/30 object-contain">
                                 </div>
                             ` : ''}
@@ -747,13 +818,9 @@
                 renderFeed();
             };
 
-            // 13. Logout Handler
             window.handleLogout = () => {
-                if (confirm("Are you sure you want to log out?")) {
-                    roleSelector.value = "FREE";
-                    renderFeed();
-                    alert("Logged out successfully.");
-                }
+                localStorage.removeItem("active_portal_user");
+                location.reload();
             };
 
             roleSelector.addEventListener("change", renderFeed);
