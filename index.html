@@ -6,6 +6,11 @@
     <title>Trading Panda - VIP Trading Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0b0813; }
@@ -22,14 +27,14 @@
 </head>
 <body class="bg-[#0b0813] text-white min-h-screen flex flex-col font-sans">
 
-    <!-- AUTHENTICATION MODAL -->
+    <!-- AUTHENTICATION MODAL POPUP -->
     <div id="auth-modal" class="fixed inset-0 bg-[#0b0813]/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-[#130d24] border border-purple-900/40 p-6 md:p-8 rounded-2xl max-w-md w-full shadow-2xl space-y-6">
             <div class="text-center space-y-2">
                 <h2 class="text-2xl font-extrabold flex items-center justify-center gap-2">
                     🐼 TRADING <span class="text-purple-400">PANDA</span>
                 </h2>
-                <p class="text-xs text-gray-400">VIP Signals & Market Analytics Portal</p>
+                <p class="text-xs text-gray-400">VIP Signals & Gold Market Analytics Portal</p>
             </div>
 
             <div class="flex border-b border-purple-900/30 text-sm font-semibold">
@@ -64,7 +69,7 @@
     <!-- SIDEBAR OVERLAY -->
     <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
-    <!-- HEADER -->
+    <!-- TOP HEADER -->
     <header class="flex items-center justify-between px-4 md:px-6 py-3.5 bg-[#120b22] border-b border-purple-900/30 w-full z-30 sticky top-0">
         <div class="flex items-center gap-3 md:gap-4">
             <button id="toggle-sidebar-btn" onclick="toggleSidebar()" class="md:hidden text-gray-300 hover:text-white text-xl p-1 focus:outline-none">
@@ -96,7 +101,7 @@
         </div>
     </header>
 
-    <!-- MAIN LAYOUT -->
+    <!-- MAIN WORKSPACE LAYOUT -->
     <div class="flex flex-1 overflow-hidden relative">
 
         <aside id="sidebar-drawer" class="w-64 bg-[#120b22] border-r border-purple-900/30 flex flex-col justify-between p-4 z-20 shrink-0 fixed md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
@@ -146,13 +151,14 @@
                             Free Plan
                         </span>
                         <span class="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-semibold border border-emerald-500/30 flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span> LIVE
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span> LIVE REALTIME
                         </span>
                     </div>
                 </div>
 
                 <div id="signals-feed-list" class="space-y-4 max-w-4xl"></div>
 
+                <!-- Admin Publish -->
                 <div id="admin-publish-section" class="hidden bg-[#130d24] p-6 rounded-xl border border-purple-900/30 shadow-xl max-w-4xl space-y-4">
                     <h3 class="text-md font-bold text-purple-300 flex items-center gap-2">
                         ➕ Admin: Publish New Signal
@@ -199,7 +205,7 @@
                         </div>
 
                         <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-bold text-sm transition shadow-lg flex items-center justify-center gap-2">
-                            🚀 Publish Signal
+                            🚀 Broadcast Live Signal
                         </button>
                     </form>
                 </div>
@@ -378,8 +384,24 @@
         </main>
     </div>
 
-    <!-- SCRIPT ENGINE -->
+    <!-- SCRIPT ENGINE WITH YOUR FIREBASE REALTIME SYNC -->
     <script>
+        // Exact Credentials from your Firebase Console
+        const firebaseConfig = {
+            apiKey: "AIzaSyB627RgISSHynjSJ27ayY-Tkd_yV1pUa5Y",
+            authDomain: "trading-panda-308a4.firebaseapp.com",
+            databaseURL: "https://trading-panda-308a4-default-rtdb.firebaseio.com",
+            projectId: "trading-panda-308a4",
+            storageBucket: "trading-panda-308a4.firebasestorage.app",
+            messagingSenderId: "163920864079",
+            appId: "1:163920864079:web:8e7947d054b9fc0852db3a"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
         let isAuthModeLogin = true;
 
         function toggleSidebar() {
@@ -409,7 +431,6 @@
             }
         }
 
-        // Image Compressor Helper to avoid LocalStorage Overflow
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -445,8 +466,9 @@
             const authForm = document.getElementById("auth-form");
 
             let currentSelectedPlan = "PRO MONTHLY (PKR 3,000)";
+            let liveSignalsData = [];
 
-            // Check Session
+            // Session Verification
             const activeUser = localStorage.getItem("active_portal_user");
             if (!activeUser) {
                 authModal.classList.remove("hidden");
@@ -478,9 +500,6 @@
 
                 const userData = { email, name, role: "FREE", joinedAt: Date.now() };
                 localStorage.setItem("active_portal_user", JSON.stringify(userData));
-                if (!localStorage.getItem("user_signup_time")) {
-                    localStorage.setItem("user_signup_time", Date.now().toString());
-                }
 
                 authModal.classList.add("hidden");
 
@@ -495,7 +514,7 @@
                 renderFeed();
             });
 
-            // Ticker Fetch (Binance Public API)
+            // Ticker Fetch (Binance API)
             async function fetchLiveTicker() {
                 try {
                     const resBtc = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
@@ -513,6 +532,23 @@
             }
             fetchLiveTicker();
             setInterval(fetchLiveTicker, 5000);
+
+            // REALTIME FIREBASE DATABASE LISTENERS
+            db.ref("signals").on("value", (snapshot) => {
+                const data = snapshot.val();
+                liveSignalsData = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        liveSignalsData.push({ id: key, ...data[key] });
+                    });
+                }
+                renderFeed();
+            });
+
+            db.ref("pending_payments").on("value", (snapshot) => {
+                const data = snapshot.val();
+                renderPendingPayments(data);
+            });
 
             // Tab Switcher
             window.switchTab = (tabName) => {
@@ -557,25 +593,9 @@
                 });
             }
 
-            function getSignals() {
-                const stored = localStorage.getItem("trading_signals_data");
-                if (!stored) {
-                    const now = Date.now();
-                    const initialSignals = [
-                        { id: now, pair: "XAUUSD", type: "BUY", entry: "2738.50", sl: "2725.00", tp1: "2745.00", tp2: "2755.00", tp3: "2770.00", status: "ACTIVE", result: "", timestamp: now }
-                    ];
-                    localStorage.setItem("trading_signals_data", JSON.stringify(initialSignals));
-                    return initialSignals;
-                }
-                return JSON.parse(stored);
-            }
-
             function renderFeed() {
                 const currentRole = roleSelector.value;
-                const allSignals = getSignals();
-
-                // Chronological sorting
-                allSignals.sort((a, b) => a.timestamp - b.timestamp);
+                liveSignalsData.sort((a, b) => a.timestamp - b.timestamp);
 
                 if (currentRole === "ADMIN") {
                     adminSection.classList.remove("hidden");
@@ -595,7 +615,7 @@
                 }
 
                 signalsFeedList.innerHTML = "";
-                const activeSignals = allSignals.filter(s => s.status === "ACTIVE").reverse();
+                const activeSignals = liveSignalsData.filter(s => s.status === "ACTIVE").reverse();
 
                 if (activeSignals.length === 0) {
                     signalsFeedList.innerHTML = `<div class="text-center py-8 text-gray-400 bg-[#130d24] rounded-xl border border-purple-900/20">No active live signals right now.</div>`;
@@ -604,7 +624,6 @@
                         const card = document.createElement("div");
                         card.className = "relative bg-[#130d24] p-4 rounded-xl border border-purple-900/30 overflow-hidden shadow-md signal-card";
 
-                        // Strict Index Lock Rule: Only first 5 array elements unlocked for FREE
                         let isLocked = false;
                         if (currentRole === "FREE" && index >= 5) {
                             isLocked = true;
@@ -647,11 +666,11 @@
 
                                     ${currentRole === "ADMIN" ? `
                                         <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-purple-900/20 justify-end">
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP1 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP1 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP2 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP2 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'TP3 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP3 Hit</button>
-                                            <button onclick="updateSignalStatus(${signal.id}, 'SL HIT')" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">SL Hit</button>
-                                            <button onclick="deleteSignal(${signal.id})" class="bg-gray-700 hover:bg-gray-600 text-white px-2.5 py-1 rounded text-xs">Delete</button>
+                                            <button onclick="updateSignalStatus('${signal.id}', 'TP1 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP1 Hit</button>
+                                            <button onclick="updateSignalStatus('${signal.id}', 'TP2 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP2 Hit</button>
+                                            <button onclick="updateSignalStatus('${signal.id}', 'TP3 HIT')" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">TP3 Hit</button>
+                                            <button onclick="updateSignalStatus('${signal.id}', 'SL HIT')" class="bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold">SL Hit</button>
+                                            <button onclick="deleteSignal('${signal.id}')" class="bg-gray-700 hover:bg-gray-600 text-white px-2.5 py-1 rounded text-xs">Delete</button>
                                         </div>
                                     ` : ''}
                                 </div>
@@ -663,15 +682,12 @@
                 }
 
                 renderClosedLogs();
-                renderPendingPayments();
             }
 
+            // Publish Signal to Firebase
             signalForm.addEventListener("submit", (e) => {
                 e.preventDefault();
-                const signals = getSignals();
-
                 const newSignal = {
-                    id: Date.now(),
                     pair: document.getElementById("signal-pair").value.toUpperCase(),
                     type: document.getElementById("signal-type").value,
                     entry: document.getElementById("signal-entry").value,
@@ -684,35 +700,26 @@
                     timestamp: Date.now()
                 };
 
-                signals.push(newSignal);
-                localStorage.setItem("trading_signals_data", JSON.stringify(signals));
+                db.ref("signals").push(newSignal);
                 signalForm.reset();
-                renderFeed();
-                alert("New Signal Published!");
+                alert("Signal Broadcasted Live to All Users Globally!");
             });
 
             window.updateSignalStatus = (id, statusResult) => {
-                let signals = getSignals();
-                const signal = signals.find(s => s.id === id);
-                if (signal) {
-                    signal.status = "CLOSED";
-                    signal.result = statusResult;
-                    localStorage.setItem("trading_signals_data", JSON.stringify(signals));
-                    renderFeed();
-                }
+                db.ref(`signals/${id}`).update({
+                    status: "CLOSED",
+                    result: statusResult
+                });
             };
 
             window.deleteSignal = (id) => {
                 if (confirm("Delete signal?")) {
-                    let signals = getSignals();
-                    signals = signals.filter(s => s.id !== id);
-                    localStorage.setItem("trading_signals_data", JSON.stringify(signals));
-                    renderFeed();
+                    db.ref(`signals/${id}`).remove();
                 }
             };
 
             function renderClosedLogs() {
-                const signals = getSignals().filter(s => s.status === "CLOSED");
+                const signals = liveSignalsData.filter(s => s.status === "CLOSED");
                 const goldClosedList = document.getElementById("gold-closed-list");
                 const forexClosedList = document.getElementById("forex-closed-list");
 
@@ -747,7 +754,6 @@
                 document.getElementById("gold-winrate-stat").innerText = `${winrate}%`;
             }
 
-            // Accurate Asset Lot Size Calculation
             window.calculateLotSize = () => {
                 const asset = document.getElementById("calc-asset").value;
                 const balance = parseFloat(document.getElementById("calc-balance").value) || 1000;
@@ -770,39 +776,6 @@
                 document.getElementById("calc-result").classList.remove("hidden");
             };
 
-            // Avatar Upload with Compression
-            const avatarInput = document.getElementById("avatar-input");
-            avatarInput.addEventListener("change", (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    compressImage(file, (compressedBase64) => {
-                        localStorage.setItem("user_profile_avatar", compressedBase64);
-                        loadProfileAvatar();
-                    });
-                }
-            });
-
-            function loadProfileAvatar() {
-                const savedAvatar = localStorage.getItem("user_profile_avatar");
-                if (savedAvatar) {
-                    document.getElementById("profile-avatar-img").src = savedAvatar;
-                    document.getElementById("profile-avatar-img").classList.remove("hidden");
-                    document.getElementById("profile-avatar-placeholder").classList.add("hidden");
-                }
-            }
-            loadProfileAvatar();
-
-            window.saveProfileInfo = () => {
-                alert("Profile saved successfully!");
-            };
-
-            window.selectPlan = (planName) => {
-                currentSelectedPlan = planName;
-                document.getElementById("selected-plan-text").innerText = planName;
-                document.getElementById("payment-box").scrollIntoView({ behavior: 'smooth' });
-            };
-
-            // Payment Screenshot with Compression
             const payScreenshotInput = document.getElementById("pay-screenshot");
             let uploadedScreenshotBase64 = "";
 
@@ -815,43 +788,36 @@
                 }
             });
 
+            // Submit Payment Proof to Firebase
             document.getElementById("payment-submit-form").addEventListener("submit", (e) => {
                 e.preventDefault();
                 const sender = document.getElementById("pay-sender").value;
                 const tid = document.getElementById("pay-tid").value;
 
-                const pendingPayments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
-                pendingPayments.push({
-                    id: Date.now(),
+                db.ref("pending_payments").push({
                     sender,
                     tid,
                     plan: currentSelectedPlan,
                     screenshot: uploadedScreenshotBase64,
                     date: new Date().toLocaleDateString()
                 });
-                
-                try {
-                    localStorage.setItem("pending_payments", JSON.stringify(pendingPayments));
-                    alert("Payment Proof Submitted! Status: In Review.");
-                    e.target.reset();
-                    uploadedScreenshotBase64 = "";
-                    renderPendingPayments();
-                } catch(err) {
-                    alert("Storage space full. Please clear browser storage or upload a smaller screenshot.");
-                }
+
+                alert("Payment Proof Submitted Realtime to Admin! Status: In Review.");
+                e.target.reset();
+                uploadedScreenshotBase64 = "";
             });
 
-            function renderPendingPayments() {
+            function renderPendingPayments(paymentsObj) {
                 const list = document.getElementById("pending-payments-list");
-                const payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
                 list.innerHTML = "";
 
-                if (payments.length === 0) {
+                if (!paymentsObj) {
                     list.innerHTML = `<p class="text-xs text-gray-400">No pending verification requests.</p>`;
                     return;
                 }
 
-                payments.forEach(p => {
+                Object.keys(paymentsObj).forEach(key => {
+                    const p = paymentsObj[key];
                     list.innerHTML += `
                         <div class="bg-[#1c1335] p-4 rounded-xl border border-purple-900/30 text-xs space-y-3">
                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -859,7 +825,7 @@
                                     <p class="font-bold text-white text-sm">Sender: ${p.sender}</p>
                                     <p class="text-purple-300">Plan: <strong>${p.plan}</strong> | TID: <strong>${p.tid}</strong></p>
                                 </div>
-                                <button onclick="approvePayment(${p.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold">Approve Upgrade</button>
+                                <button onclick="approvePayment('${key}')" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold">Approve Upgrade</button>
                             </div>
                             ${p.screenshot ? `
                                 <div class="pt-2 border-t border-purple-900/20">
@@ -871,13 +837,9 @@
                 });
             }
 
-            window.approvePayment = (id) => {
-                let payments = JSON.parse(localStorage.getItem("pending_payments") || "[]");
-                payments = payments.filter(p => p.id !== id);
-                localStorage.setItem("pending_payments", JSON.stringify(payments));
-                alert("Payment Approved! User upgraded to VIP.");
-                roleSelector.value = "VIP";
-                renderFeed();
+            window.approvePayment = (key) => {
+                db.ref(`pending_payments/${key}`).remove();
+                alert("Payment Approved!");
             };
 
             window.handleLogout = () => {
@@ -886,7 +848,6 @@
             };
 
             roleSelector.addEventListener("change", renderFeed);
-            renderFeed();
         });
     </script>
 </body>
